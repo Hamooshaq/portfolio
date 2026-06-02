@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { LiveDeploymentLauncher } from "@/components/projects/live-deployment-launcher";
 import { liveDeployments } from "@/config/deployments";
+import { deepfakeApiConfig } from "@/config/deepfake-api";
 import { cn } from "@/lib/cn";
 import { repositoryIntelligence } from "@/config/repository-intelligence";
 
@@ -13,11 +14,12 @@ const deepfake = repositoryIntelligence.repositories.deepfake;
 const appData = deepfake.showcase.appData;
 
 type DetectionResult = {
-  label: "REAL" | "FAKE";
+  label: string;
   probability: number;
   framesUsed: number;
   correctness: string;
   details: Array<{ frame: number; probability: number }>;
+  rawDetails: string;
   source: string;
 };
 
@@ -29,10 +31,26 @@ export function AIExperiments() {
   const [threshold, setThreshold] = useState(appData.threshold);
   const [margin, setMargin] = useState(0.25);
   const [result, setResult] = useState<DetectionResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   async function runDetection() {
-    const result = await buildDeepfakeResult(file, frames, threshold, trueLabel, useCrop, margin);
-    setResult(result);
+    if (!file) {
+      setError("Upload a video first so the Hugging Face Space can run the real detector.");
+      return;
+    }
+
+    setIsRunning(true);
+    setError(null);
+
+    try {
+      const result = await predictWithHuggingFace(file, frames, threshold, trueLabel, useCrop, margin);
+      setResult(result);
+    } catch (caughtError) {
+      setError(formatPredictError(caughtError));
+    } finally {
+      setIsRunning(false);
+    }
   }
 
   return (
@@ -61,17 +79,16 @@ export function AIExperiments() {
         <div className="rounded-3xl border border-slate-200 bg-slate-950 p-5 text-white">
           <p className="text-sm font-semibold">Deepfake upload workflow</p>
           <p className="mt-2 text-sm leading-6 text-white/55">
-            The full PyTorch checkpoint stays out of the browser bundle. This interaction preserves
-            the notebook UI, tuned threshold logic, sampled-frame output, and validation-score
-            calibration from the repository.
+            The portfolio sends the uploaded video to Mohammad&apos;s Hugging Face Space and renders
+            the real Gradio `/ui_predict` response here. PyTorch stays out of Vercel.
           </p>
 
           <div className="mt-5 grid gap-4">
             <label className="rounded-2xl border border-dashed border-white/15 bg-white/[0.04] p-4">
-              <span className="text-sm font-medium">Upload video or image</span>
+              <span className="text-sm font-medium">Upload video</span>
               <input
                 type="file"
-                accept="video/*,image/*"
+                accept="video/*,.mp4,.mov,.avi,.mkv"
                 onChange={(event) => setFile(event.target.files?.[0] ?? null)}
                 className="mt-3 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-xs file:font-semibold file:text-slate-950"
               />
@@ -136,10 +153,16 @@ export function AIExperiments() {
             <button
               type="button"
               onClick={() => void runDetection()}
-              className="min-h-11 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950"
+              disabled={!file || isRunning}
+              className="min-h-11 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-white/45"
             >
-              Run detection
+              {isRunning ? "Running on Hugging Face..." : "Run detection"}
             </button>
+            {error ? (
+              <p className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm leading-6 text-red-100">
+                {error}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
@@ -178,17 +201,23 @@ function ResultPanel({ result, threshold }: { result: DetectionResult | null; th
             {result.framesUsed} sampled frames, threshold {threshold.toFixed(2)}, correctness: {result.correctness}
           </p>
           <div className="mt-5 grid gap-2 sm:grid-cols-2">
-            {result.details.slice(0, 12).map((item) => (
-              <div key={item.frame} className="rounded-xl bg-slate-50 px-3 py-2 font-mono text-xs text-slate-600">
-                frame {item.frame}: p(fake)={item.probability.toFixed(4)}
-              </div>
-            ))}
+            {result.details.length > 0 ? (
+              result.details.slice(0, 12).map((item) => (
+                <div key={item.frame} className="rounded-xl bg-slate-50 px-3 py-2 font-mono text-xs text-slate-600">
+                  frame {item.frame}: p(fake)={item.probability.toFixed(4)}
+                </div>
+              ))
+            ) : (
+              <pre className="col-span-full max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-50 p-4 font-mono text-xs leading-6 text-slate-600">
+                {result.rawDetails}
+              </pre>
+            )}
           </div>
         </div>
       ) : (
         <p className="mt-4 text-sm leading-7 text-slate-600">
-          Upload a file or run the detector without a file to replay a validation sample from the
-          repository output distribution.
+          Upload a short video and run the detector. The output comes from the live Hugging Face
+          Space, not a browser-side approximation.
         </p>
       )}
     </section>
@@ -221,7 +250,7 @@ function ValidationConsole() {
   );
 }
 
-async function buildDeepfakeResult(
+async function predictWithHuggingFace(
   file: File | null,
   frames: number,
   threshold: number,
@@ -229,46 +258,67 @@ async function buildDeepfakeResult(
   useCrop: boolean,
   margin: number
 ): Promise<DetectionResult> {
-  const base = file ? await probabilityFromFile(file, useCrop, margin) : Number(appData.videoScores[0]?.probabilityFake ?? 0.99);
-  const details = Array.from({ length: frames }, (_, index) => {
-    const wave = Math.sin(index * 1.7 + base * 4) * 0.08 + Math.cos(index * 0.41) * 0.04;
-    return {
-      frame: Math.round((index / Math.max(frames - 1, 1)) * 1000),
-      probability: clamp(base + wave, 0.001, 0.999)
-    };
+  if (!file) {
+    throw new Error("No video selected.");
+  }
+
+  const { Client } = await import("@gradio/client");
+  const client = await Client.connect(deepfakeApiConfig.spaceId);
+  const response = await client.predict(deepfakeApiConfig.apiName, {
+    video_file: file,
+    true_label: trueLabel,
+    use_crop: useCrop,
+    frame_count: frames,
+    threshold,
+    margin
   });
-  const probability = details.reduce((total, item) => total + item.probability, 0) / details.length;
-  const label = probability >= threshold ? "FAKE" : "REAL";
-  const correctness = trueLabel === "Unknown" ? "N/A" : trueLabel === label ? "Correct" : "Wrong";
+
+  return parseHuggingFaceResult(response.data, file.name);
+}
+
+function parseHuggingFaceResult(data: unknown, filename: string): DetectionResult {
+  if (!Array.isArray(data)) {
+    throw new Error("Unexpected Hugging Face response shape.");
+  }
+
+  const [labelValue, probabilityValue, framesValue, correctnessValue, detailsValue] = data;
+  const probability = Number(probabilityValue);
+  const rawDetails = String(detailsValue ?? "");
 
   return {
-    label,
-    probability,
-    framesUsed: frames,
-    correctness,
-    details,
-    source: file
-      ? `Uploaded ${file.type || "file"} analyzed with the browser-safe detector wrapper`
-      : "Validation sample replayed from repository outputs"
+    label: String(labelValue ?? "UNKNOWN"),
+    probability: Number.isFinite(probability) ? probability : 0,
+    framesUsed: Number(framesValue) || 0,
+    correctness: String(correctnessValue ?? "N/A"),
+    details: parseFrameDetails(rawDetails),
+    rawDetails,
+    source: `${filename} analyzed by ${deepfakeApiConfig.spaceId}${deepfakeApiConfig.apiName}`
   };
 }
 
-async function probabilityFromFile(file: File, useCrop: boolean, margin: number) {
-  const buffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(buffer.slice(0, Math.min(buffer.byteLength, 120000)));
-  let hash = 2166136261;
-  let energy = 0;
-  for (const byte of bytes) {
-    hash ^= byte;
-    hash = Math.imul(hash, 16777619);
-    energy += Math.abs(byte - 128);
+function parseFrameDetails(details: string) {
+  return details
+    .split("\n")
+    .map((line) => {
+      const match = line.match(/frame\s+(\d+):\s+p\(fake\)=([0-9.]+)/i);
+      if (!match) {
+        return null;
+      }
+
+      return {
+        frame: Number(match[1]),
+        probability: Number(match[2])
+      };
+    })
+    .filter((item): item is { frame: number; probability: number } => Boolean(item));
+}
+
+function formatPredictError(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
   }
-  const hashed = ((hash >>> 0) % 10000) / 10000;
-  const texture = energy / Math.max(bytes.length * 128, 1);
-  const sizeSignal = Math.min(0.2, Math.log10(file.size + 10) / 50);
-  const cropAdjustment = useCrop ? 0.03 - margin * 0.02 : -0.02;
-  const validationAnchor = Number(appData.videoScores[Math.floor(hashed * appData.videoScores.length)]?.probabilityFake ?? 0.5);
-  return clamp(validationAnchor * 0.55 + texture * 0.35 + sizeSignal + cropAdjustment, 0.02, 0.98);
+
+  return "The Hugging Face Space could not return a prediction. It may be waking up; try again in a moment.";
 }
 
 function Control({ label, children }: { label: string; children: ReactNode }) {
@@ -287,8 +337,4 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="mt-2 font-mono text-lg font-semibold text-slate-950">{value}</p>
     </div>
   );
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
 }

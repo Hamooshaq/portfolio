@@ -12,6 +12,10 @@ function externalUrl(value: string | undefined) {
   return normalized ? normalized : null;
 }
 
+function externalUrlWithFallback(value: string | undefined, fallback: string) {
+  return externalUrl(value) ?? fallback;
+}
+
 export const liveDeployments = {
   forecasting: {
     id: "forecasting",
@@ -26,7 +30,10 @@ export const liveDeployments = {
     label: "Open deepfake detector",
     provider: "Hugging Face Spaces",
     runtime: "Gradio / PyTorch CPU",
-    url: externalUrl(process.env.NEXT_PUBLIC_DEEPFAKE_SPACE_URL),
+    url: externalUrlWithFallback(
+      process.env.NEXT_PUBLIC_DEEPFAKE_SPACE_URL,
+      "https://hamooshaq-deepfake-detection.hf.space"
+    ),
     coldStartNote: "The Space lazy-loads the checkpoint. Short videos work best on the free CPU tier."
   },
   crowd: {
