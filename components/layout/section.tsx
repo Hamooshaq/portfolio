@@ -14,7 +14,7 @@ export function Section({
     <section
       id={id}
       data-section={id}
-      className={cn("scroll-mt-24 px-5 py-24 sm:px-8 lg:px-10", className)}
+      className={cn("scroll-mt-24 px-4 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24", className)}
     >
       <div className="mx-auto max-w-7xl">{children}</div>
     </section>

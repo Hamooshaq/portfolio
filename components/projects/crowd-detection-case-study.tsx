@@ -40,7 +40,7 @@ export function CrowdDetectionCaseStudy() {
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
       <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-        <div>
+        <div className="min-w-0">
           <SectionHeading eyebrow="Interactive crowd counter" title={crowd.title}>
             <p>
               This section exposes the notebook inference behavior: choose a real evaluation image
@@ -88,7 +88,7 @@ export function CrowdDetectionCaseStudy() {
         </div>
       </div>
 
-      <div className="mt-8 flex gap-2 overflow-x-auto rounded-full border border-slate-200 bg-slate-50 p-1">
+      <div className="mt-8 flex max-w-full gap-2 overflow-x-auto rounded-full border border-slate-200 bg-slate-50 p-1">
         <button
           type="button"
           onClick={() => setMode("sample")}
@@ -206,7 +206,7 @@ function UploadWorkbench({ result, alpha }: { result: UploadResult | null; alpha
         />
         <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-semibold text-slate-950">Peak proposals</p>
-          <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-slate-950">{result.peaks}</p>
+      <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">{result.peaks}</p>
           <p className="mt-2 text-sm text-slate-500">
             Inference size {result.width} x {result.height}; peak proposals are visual cues, while
             the count is based on density integration.
@@ -316,9 +316,9 @@ function DarkStat({ label, value }: { label: string; value: number | null }) {
 function Bar({ label, value, max, tone }: { label: string; value: number; max: number; tone?: "muted" | "strong" }) {
   return (
     <div>
-      <div className="flex justify-between gap-3 text-sm">
+      <div className="flex min-w-0 justify-between gap-3 text-sm">
         <span className="text-slate-600">{label}</span>
-        <span className="font-mono text-slate-500">{format(value)}</span>
+        <span className="shrink-0 font-mono text-slate-500">{format(value)}</span>
       </div>
       <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-100">
         <div

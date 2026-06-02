@@ -87,7 +87,7 @@ export function ForecastingCaseStudy() {
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
       <div className="grid gap-8 xl:grid-cols-[0.8fr_1.2fr]">
-        <div>
+        <div className="min-w-0">
           <SectionHeading eyebrow="Live planning tool" title={forecasting.title}>
             <p>
               This section rebuilds the Streamlit planner interaction from the repository: adjust the
@@ -131,7 +131,7 @@ export function ForecastingCaseStudy() {
         <Stat label="Supplier drafts" value={String(supplierOrders.length)} />
       </div>
 
-      <div className="mt-8 flex gap-2 overflow-x-auto rounded-full border border-slate-200 bg-slate-50 p-1">
+      <div className="mt-8 flex max-w-full gap-2 overflow-x-auto rounded-full border border-slate-200 bg-slate-50 p-1">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -305,7 +305,7 @@ function PlannerControls({
       </div>
 
       <div className="mt-6 grid gap-4 border-t border-white/10 pt-5 lg:grid-cols-[1fr_0.75fr]">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold">Quick stock update</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_0.7fr]">
             <select
@@ -370,7 +370,7 @@ function PlannerControls({
           />
           {uploadStatus ? (
             <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.06] p-3 text-xs leading-5 text-white/65">
-              <span className="block font-semibold text-white">{uploadStatus.filename}</span>
+              <span className="block break-words font-semibold text-white">{uploadStatus.filename}</span>
               {uploadStatus.matchedItems} items matched, {uploadStatus.changedItems} stock values changed.
               {uploadStatus.changedItems === 0 ? (
                 <span className="mt-1 block text-amber-200">
@@ -380,9 +380,9 @@ function PlannerControls({
               {(uploadStatus.changedExamples?.length ?? 0) > 0 ? (
                 <div className="mt-3 grid gap-1.5">
                   {(uploadStatus.changedExamples ?? []).map((item) => (
-                    <div key={item.item} className="flex items-center justify-between gap-3 rounded-lg bg-white/[0.06] px-2.5 py-1.5">
-                      <span className="truncate text-white/75">{item.item}</span>
-                      <span className="font-mono text-white">
+                    <div key={item.item} className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-white/[0.06] px-2.5 py-1.5">
+                      <span className="min-w-0 break-words text-white/75">{item.item}</span>
+                      <span className="shrink-0 font-mono text-white">
                         {format(item.from, 2)}
                         {" -> "}
                         {format(item.to, 2)}
@@ -586,7 +586,7 @@ function SuppliersTab({ orders }: { orders: ReturnType<typeof buildSupplierOrder
           </div>
           <button
             type="button"
-            className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700"
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700"
           >
             <Download className="h-4 w-4" /> Draft ready
           </button>
@@ -713,7 +713,7 @@ function LineChart({
         <span>{primaryLabel}</span>
         {secondaryLabel ? <span>{secondaryLabel}</span> : null}
       </div>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-64 w-full rounded-2xl bg-slate-50">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-52 w-full rounded-2xl bg-slate-50 sm:h-64">
         <polyline points={draw(primary)} fill="none" stroke="rgb(148 163 184)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
         {secondary ? (
           <polyline points={draw(secondary)} fill="none" stroke="rgb(245 158 11)" strokeWidth="2.4" vectorEffect="non-scaling-stroke" />
@@ -726,8 +726,8 @@ function LineChart({
 function DataTable({ rows }: { rows: Array<Record<string, string | number>> }) {
   const headers = Object.keys(rows[0] ?? {});
   return (
-    <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
-      <table className="w-full min-w-[680px] text-sm">
+    <div className="mt-5 max-w-full overflow-x-auto rounded-2xl border border-slate-200">
+      <table className="w-full min-w-[560px] text-sm sm:min-w-[680px]">
         <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.12em] text-slate-400">
           <tr>{headers.map((header) => <th key={header} className="px-4 py-3 font-medium">{header}</th>)}</tr>
         </thead>
@@ -758,7 +758,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "am
   return (
     <div className={cn("rounded-2xl border bg-slate-50 p-4", tone === "red" && "border-red-200 bg-red-50", tone === "amber" && "border-amber-200 bg-amber-50", tone === "green" && "border-emerald-200 bg-emerald-50")}>
       <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{value}</p>
+      <p className="mt-2 break-words text-xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-2xl">{value}</p>
     </div>
   );
 }
@@ -768,7 +768,7 @@ function Toggle({ label, checked, setChecked }: { label: string; checked: boolea
     <button
       type="button"
       onClick={() => setChecked(!checked)}
-      className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm"
+      className="flex min-h-11 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm"
     >
       {label}
       <span className={cn("h-5 w-9 rounded-full p-1 transition", checked ? "bg-amber-400" : "bg-white/15")}>

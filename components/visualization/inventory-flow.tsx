@@ -21,13 +21,13 @@ export function InventoryFlow() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row">
         <div>
           <p className="text-sm font-semibold text-slate-950">Reorder calculation</p>
-          <p className="mt-2 max-w-xl text-sm leading-7 text-slate-600">
+          <p className="mt-2 max-w-xl break-words text-sm leading-7 text-slate-600">
             recommended_reorder_qty = max(lead_time_demand + reorder_level - current_stock, 0)
           </p>
         </div>
         <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white">
           <p className="text-xs uppercase tracking-[0.14em] text-white/50">recommendation</p>
-          <p className="mt-2 text-3xl font-semibold">{recommended}</p>
+          <p className="mt-2 text-2xl font-semibold sm:text-3xl">{recommended}</p>
         </div>
       </div>
 
@@ -38,7 +38,7 @@ export function InventoryFlow() {
             <div className="mt-3 flex items-center justify-between">
               <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white p-2"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white p-2"
                 onClick={() => control.set(Math.max(0, control.value - 5))}
                 aria-label={`Decrease ${control.label}`}
               >
@@ -47,7 +47,7 @@ export function InventoryFlow() {
               <span className="text-2xl font-semibold text-slate-950">{control.value}</span>
               <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white p-2"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-slate-200 bg-white p-2"
                 onClick={() => control.set(control.value + 5)}
                 aria-label={`Increase ${control.label}`}
               >

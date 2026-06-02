@@ -32,7 +32,7 @@ export function CrowdModelComparison() {
             type="button"
             onClick={() => setMode(track)}
             className={cn(
-              "flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+              "flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4",
               mode === track ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
             )}
           >
@@ -75,7 +75,7 @@ export function CrowdModelComparison() {
               );
             })}
           </div>
-          <p className="absolute bottom-4 left-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+          <p className="absolute bottom-4 left-4 right-4 max-w-[calc(100%-2rem)] rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
             density-map visualization, not a reported metric
           </p>
         </div>

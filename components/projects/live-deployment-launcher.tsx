@@ -19,7 +19,7 @@ export function LiveDeploymentLauncher({ deployment, className }: LiveDeployment
       )}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
             <RadioTower aria-hidden className="h-4 w-4" />
             Live deployment
@@ -30,11 +30,11 @@ export function LiveDeploymentLauncher({ deployment, className }: LiveDeployment
         </div>
 
         {deployment.url ? (
-          <ButtonLink href={deployment.url} variant="secondary" className="bg-white">
+          <ButtonLink href={deployment.url} variant="secondary" className="w-full shrink-0 bg-white sm:w-auto">
             {deployment.label}
           </ButtonLink>
         ) : (
-          <span className="inline-flex min-h-11 items-center justify-center rounded-full border border-dashed border-slate-300 px-5 text-sm font-medium text-slate-500">
+          <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full border border-dashed border-slate-300 px-5 text-center text-sm font-medium text-slate-500 sm:w-auto">
             Deployment coming soon
           </span>
         )}

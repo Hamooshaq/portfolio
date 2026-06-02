@@ -83,7 +83,7 @@ export function MetricStrip({ metrics }: { metrics: readonly OutcomeMetric[] }) 
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
             {metric.label}
           </p>
-          <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">
+          <p className="mt-2 break-words text-xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-2xl">
             {metric.value ?? "N/A"}
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">{metric.detail}</p>
@@ -110,8 +110,8 @@ export function OutputPreviewTable({
         <p className="text-sm font-semibold text-slate-950">{title}</p>
         <p className="font-mono text-xs text-slate-400">{source}</p>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] border-collapse text-sm">
+      <div className="max-w-full overflow-x-auto">
+        <table className="w-full min-w-[560px] border-collapse text-sm sm:min-w-[620px]">
           <thead className="bg-white text-left text-xs uppercase tracking-[0.12em] text-slate-400">
             <tr>
               {columns.map((column) => (
@@ -172,9 +172,9 @@ export function RankingBars({
 
           return (
             <div key={`${String(row[labelKey])}-${index}`}>
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="truncate font-medium text-slate-800">{String(row[labelKey])}</span>
-                <span className="font-mono text-xs text-slate-500">{formatNumber(value)} {valueLabel}</span>
+              <div className="flex min-w-0 items-center justify-between gap-4 text-sm">
+                <span className="min-w-0 break-words font-medium text-slate-800">{String(row[labelKey])}</span>
+                <span className="shrink-0 font-mono text-xs text-slate-500">{formatNumber(value)} {valueLabel}</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
                 <div
@@ -222,7 +222,7 @@ export function MetricComparisonBars({
 
           return (
             <div key={item.label}>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center justify-between gap-3">
                 <p className="text-sm font-medium text-slate-800">{item.label}</p>
                 {change !== null && item.lowerIsBetter ? (
                   <p className="font-mono text-xs text-emerald-600">{formatNumber(change, 1)}% lower</p>
@@ -280,7 +280,7 @@ export function MiniLineChart({
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <p className="text-sm font-semibold text-slate-950">{title}</p>
         <div className="flex flex-wrap justify-end gap-3">
           {series.map((item) => (
@@ -325,8 +325,8 @@ function ComparisonBar({
   className?: string;
 }) {
   return (
-    <div className="grid grid-cols-[5.5rem_1fr_4.5rem] items-center gap-3 text-xs text-slate-500">
-      <span>{label}</span>
+    <div className="grid grid-cols-[minmax(4.5rem,auto)_1fr_auto] items-center gap-3 text-xs text-slate-500">
+      <span className="min-w-0">{label}</span>
       <div className="h-2 overflow-hidden rounded-full bg-slate-100">
         <div
           className={cn("h-full rounded-full", className)}

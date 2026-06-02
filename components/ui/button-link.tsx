@@ -23,7 +23,7 @@ export function ButtonLink({
   const isFileAsset = /\.(pdf|docx?|zip)(?:[?#].*)?$/i.test(href);
   const linkTarget = target ?? (isExternal && !href.startsWith("mailto:") ? "_blank" : isFileAsset ? "_blank" : undefined);
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900",
+    "inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full px-5 text-center text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900",
     variant === "primary" && "bg-slate-950 text-white hover:bg-slate-800",
     variant === "secondary" && "border border-slate-200 bg-white text-slate-950 hover:border-slate-300",
     variant === "ghost" && "text-slate-600 hover:bg-slate-100 hover:text-slate-950",

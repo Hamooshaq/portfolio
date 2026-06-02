@@ -62,29 +62,29 @@ export function PortfolioHome({ githubData }: { githubData: GitHubData }) {
 
 function Hero({ githubUrl }: { githubUrl: string | null }) {
   return (
-    <div className="grid min-h-[68vh] gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+    <div className="grid gap-9 lg:min-h-[68vh] lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
       <div>
         <div className="flex flex-wrap gap-2">
           {siteConfig.identity.map((item) => (
             <Badge key={item}>{item}</Badge>
           ))}
         </div>
-        <h1 className="mt-8 max-w-4xl text-5xl font-semibold tracking-[-0.055em] text-slate-950 sm:text-7xl">
+        <h1 className="mt-7 max-w-4xl text-[2.65rem] font-semibold leading-[0.98] tracking-[-0.04em] text-slate-950 sm:mt-8 sm:text-6xl lg:text-7xl">
           Mohammad builds AI systems with clear interfaces and practical product logic.
         </h1>
       </div>
 
-      <div className="lg:pl-10">
-        <p className="text-xl leading-9 text-slate-700">{siteConfig.positioning}</p>
+      <div className="min-w-0 lg:pl-10">
+        <p className="text-lg leading-8 text-slate-700 sm:text-xl sm:leading-9">{siteConfig.positioning}</p>
         <p className="mt-5 leading-8 text-slate-600">{siteConfig.intro}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
           {githubUrl ? (
-            <ButtonLink href={githubUrl}>
+            <ButtonLink href={githubUrl} className="w-full min-[420px]:w-auto">
               <Github aria-hidden className="h-4 w-4" />
               GitHub
             </ButtonLink>
           ) : null}
-          <ButtonLink href={siteConfig.resumeUrl} variant="secondary">
+          <ButtonLink href={siteConfig.resumeUrl} variant="secondary" className="w-full min-[420px]:w-auto">
             <ScrollText aria-hidden className="h-4 w-4" />
             Resume
           </ButtonLink>
@@ -129,7 +129,7 @@ function Contact({ githubUrl }: { githubUrl: string | null }) {
       <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-end">
         <div>
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-white/45">Contact</p>
-          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">
+          <h2 className="mt-4 max-w-3xl text-[2.25rem] font-semibold leading-tight tracking-[-0.035em] sm:text-6xl">
             Useful systems, clear interfaces, practical experiments.
           </h2>
           <p className="mt-5 max-w-2xl leading-8 text-white/65">
@@ -138,19 +138,19 @@ function Contact({ githubUrl }: { githubUrl: string | null }) {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-          <ButtonLink href={`mailto:${siteConfig.email}`} className="bg-white text-slate-950 hover:bg-slate-100">
+          <ButtonLink href={`mailto:${siteConfig.email}`} className="w-full bg-white text-slate-950 hover:bg-slate-100 sm:w-auto lg:w-full">
             <Mail aria-hidden className="h-4 w-4" />
             Email
           </ButtonLink>
           {githubUrl ? (
-            <ButtonLink href={githubUrl} variant="secondary" className="border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10">
+            <ButtonLink href={githubUrl} variant="secondary" className="w-full border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10 sm:w-auto lg:w-full">
               GitHub
             </ButtonLink>
           ) : null}
-          <ButtonLink href={siteConfig.linkedinUrl} variant="secondary" className="border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10">
+          <ButtonLink href={siteConfig.linkedinUrl} variant="secondary" className="w-full border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10 sm:w-auto lg:w-full">
             LinkedIn
           </ButtonLink>
-          <ButtonLink href={siteConfig.resumeUrl} variant="secondary" className="border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10">
+          <ButtonLink href={siteConfig.resumeUrl} variant="secondary" className="w-full border-white/15 bg-white/5 text-white hover:border-white/25 hover:bg-white/10 sm:w-auto lg:w-full">
             Resume
           </ButtonLink>
         </div>

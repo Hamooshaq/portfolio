@@ -75,7 +75,7 @@ export function AIExperiments() {
                 onChange={(event) => setFile(event.target.files?.[0] ?? null)}
                 className="mt-3 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-xs file:font-semibold file:text-slate-950"
               />
-              {file ? <span className="mt-2 block text-xs text-white/45">{file.name}</span> : null}
+              {file ? <span className="mt-2 block break-words text-xs text-white/45">{file.name}</span> : null}
             </label>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -136,7 +136,7 @@ export function AIExperiments() {
             <button
               type="button"
               onClick={() => void runDetection()}
-              className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950"
+              className="min-h-11 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950"
             >
               Run detection
             </button>
@@ -160,10 +160,10 @@ function ResultPanel({ result, threshold }: { result: DetectionResult | null; th
         <div className="mt-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-5xl font-semibold tracking-[-0.06em] text-slate-950">{result.label}</p>
+              <p className="text-4xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-5xl">{result.label}</p>
               <p className="mt-2 text-sm text-slate-500">{result.source}</p>
             </div>
-            <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white">
+            <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white sm:shrink-0">
               <p className="text-xs uppercase tracking-[0.14em] text-white/45">P(fake)</p>
               <p className="mt-1 text-3xl font-semibold">{result.probability.toFixed(4)}</p>
             </div>
@@ -204,9 +204,9 @@ function ValidationConsole() {
       <div className="mt-4 space-y-3">
         {examples.map((example) => (
           <div key={example.video} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center justify-between gap-4">
-              <p className="truncate text-sm font-medium text-slate-800">{example.video}</p>
-              <span className="font-mono text-xs text-slate-500">{example.probabilityFake}</span>
+            <div className="flex min-w-0 items-center justify-between gap-4">
+              <p className="min-w-0 break-words text-sm font-medium text-slate-800">{example.video}</p>
+              <span className="shrink-0 font-mono text-xs text-slate-500">{example.probabilityFake}</span>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
               <div
