@@ -1,0 +1,11 @@
+deploy/
+project/
+.playwright-cli/
+output/
+**/.venv/
+**/.venv-*/
+**/__pycache__/
+**/.ipynb_checkpoints/
+**/*.pt
+**/*.pth
+**/*.zip

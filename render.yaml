@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mohammad-forecasting-planner
+    runtime: python
+    plan: free
+    buildCommand: cd deploy/forecasting-render && pip install -r requirements.txt
+    startCommand: cd deploy/forecasting-render && streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT --server.headless=true
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: "true"
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: "false"

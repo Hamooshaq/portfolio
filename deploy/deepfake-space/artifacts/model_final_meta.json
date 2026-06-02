@@ -1,0 +1,16 @@
+{
+  "model_name": "resnet50",
+  "img_size": 224,
+  "infer_frames_k": 16,
+  "threshold": 0.61,
+  "val_best": {
+    "model": "resnet50",
+    "best_epoch": 9,
+    "best_video_auc": 0.9974972191323692,
+    "best_video_f1": 0.96,
+    "best_video_acc": 0.9583333333333334,
+    "best_thr_balacc": 0.61,
+    "best_balacc": 0.9838709677255104
+  },
+  "checkpoint_source": "best_resnet50.pt"
+}

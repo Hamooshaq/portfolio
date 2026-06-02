@@ -1,0 +1,2 @@
+model,best_val_mae,best_val_rmse,raw_best_val_mae,raw_best_val_rmse,official_test_mae,official_test_rmse,official_test_nae,raw_official_test_mae,raw_official_test_rmse,raw_official_test_nae,calibration_applied,count_calibrator_slope,count_calibrator_intercept
+legacy_stage2_advanced,99.0949,184.3562,120.5541,218.542,132.3631,187.984,0.3676,129.4052,198.3007,0.2961,True,1.1535,33.1507

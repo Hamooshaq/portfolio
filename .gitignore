@@ -1,0 +1,37 @@
+.next/
+node_modules/
+out/
+dist/
+build/
+.DS_Store
+*.log
+.env*
+!.env.example
+.playwright-cli/
+output/
+
+# Local project repositories are analysis inputs only.
+/project/
+
+# Defensive excludes for heavy ML artifacts if repos are moved back into scope.
+**/.venv/
+**/.venv-*/
+**/__pycache__/
+**/.ipynb_checkpoints/
+**/node_modules/
+**/data/
+**/datasets/
+**/outputs/
+**/output/
+**/tmp/
+**/cache/
+**/artifacts/**/*.pt
+**/artifacts/**/*.pth
+**/*.pt
+**/*.pth
+**/*.zip
+
+# Required lightweight deployment checkpoints are tracked through Git LFS.
+!deploy/deepfake-space/artifacts/model_final.pt
+!deploy/crowd-space/artifacts/legacy_stage2_advanced_best.pt
+!deploy/crowd-space/artifacts/baseline_best.pt

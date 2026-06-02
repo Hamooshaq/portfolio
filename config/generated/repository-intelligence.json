@@ -1,0 +1,4829 @@
+{
+  "generatedAt": "2026-05-24T12:10:00.205Z",
+  "contract": "Generated from local repositories. The app consumes this lightweight JSON; it does not ship source repos, datasets, checkpoints, caches, or training outputs.",
+  "repositories": {
+    "forecasting": {
+      "id": "forecasting",
+      "title": "Restaurant Inventory Forecasting Capstone",
+      "eyebrow": "Repository-driven capstone prototype",
+      "repoLabel": "project/forecasting",
+      "sourceStatus": "analyzed",
+      "summary": "A Python package plus Streamlit dashboard that runs a full planning workflow: load restaurant data, forecast menu demand, convert it through recipe mappings, evaluate stock risk, and draft supplier reorders.",
+      "stack": [
+        "altair",
+        "numpy",
+        "pandas",
+        "streamlit"
+      ],
+      "structure": [
+        "app/streamlit_app.py",
+        "pyproject.toml",
+        "scripts/run_capstone_pipeline.py",
+        "src/restaurant_forecasting/__init__.py",
+        "src/restaurant_forecasting/config.py",
+        "src/restaurant_forecasting/data_loader.py",
+        "src/restaurant_forecasting/forecasting.py",
+        "src/restaurant_forecasting/inventory.py",
+        "src/restaurant_forecasting/pipeline.py",
+        "tests/test_pipeline.py"
+      ],
+      "architecture": [
+        {
+          "label": "Pipeline orchestration",
+          "file": "src/restaurant_forecasting/pipeline.py",
+          "detail": "run_pipeline wires loaders, RidgeDemandForecaster, ingredient conversion, inventory alerts, supplier reorders, draft messages, and mapping coverage into one result object."
+        },
+        {
+          "label": "Forecasting model",
+          "file": "src/restaurant_forecasting/forecasting.py",
+          "detail": "RidgeDemandForecaster builds calendar, restaurant, menu, weather, promotion, pricing, and event features, then solves ridge regression with NumPy."
+        },
+        {
+          "label": "Inventory logic",
+          "file": "src/restaurant_forecasting/inventory.py",
+          "detail": "Inventory logic is deterministic: historical ingredient usage, synthetic missing ingredient inventory, days of cover, lead-time demand, reorder quantity, supplier grouping, and draft email generation."
+        },
+        {
+          "label": "Dashboard layer",
+          "file": "app/streamlit_app.py",
+          "detail": "Streamlit exposes scenario controls, CSV uploads, Quick Stock Update state, forecast charts, stock health, supplier orders, and downloadable CSV outputs."
+        }
+      ],
+      "pipeline": [
+        "CSV loaders validate and normalize sales, inventory, recipe mapping, and supplier contact schemas.",
+        "RidgeDemandForecaster performs a time-based holdout evaluation and forecasts menu demand for a configurable horizon.",
+        "Forecasted menu quantities are joined to recipe_mapping and multiplied by quantity_per_order.",
+        "Stock alerts compare effective daily usage, current stock, reorder level, and supplier lead time.",
+        "Recommended reorder quantities are grouped by supplier and rendered as summary tables plus draft order emails."
+      ],
+      "logicSplit": [
+        "Machine learning is isolated to menu-level sales forecasting.",
+        "Ingredient conversion, stock health, reorder quantities, supplier routing, and draft messages are rule-based business logic."
+      ],
+      "codeSignals": [
+        {
+          "file": "forecasting.py",
+          "symbols": [
+            "class ForecastMetrics",
+            "class RidgeDemandForecaster",
+            "def __init__",
+            "def fit",
+            "def predict",
+            "def evaluate",
+            "def forecast",
+            "def _prepare_feature_matrix",
+            "def _build_feature_frame",
+            "def _solve_ridge",
+            "def _build_future_scenarios"
+          ]
+        },
+        {
+          "file": "inventory.py",
+          "symbols": [
+            "def latest_inventory_snapshot",
+            "def build_historical_ingredient_usage",
+            "def ensure_supplier_contacts",
+            "def build_augmented_inventory",
+            "def build_ingredient_forecast",
+            "def calculate_mapping_coverage",
+            "def build_inventory_alerts",
+            "def build_supplier_reorders",
+            "def build_supplier_order_drafts",
+            "def _attach_supplier_routing",
+            "def _classify_alert_status",
+            "def _average_daily_usage_by_ingredient",
+            "def _stable_int",
+            "def _round_quantity",
+            "def _deterministic_price_per_unit",
+            "def _infer_inventory_category"
+          ]
+        },
+        {
+          "file": "pipeline.py",
+          "symbols": [
+            "class PipelineResult",
+            "def run_pipeline"
+          ]
+        },
+        {
+          "file": "streamlit_app.py",
+          "symbols": [
+            "def _load_pipeline_api",
+            "def load_capstone_result",
+            "def _get_project_paths",
+            "def _inject_styles",
+            "def _format_number",
+            "def _format_cost",
+            "def _format_days",
+            "def _format_date",
+            "def _status_rank",
+            "def _status_chip",
+            "def _render_stat_cards",
+            "def _render_source_cards",
+            "def _render_note",
+            "def _plot_dual_series",
+            "def _plot_ranked_bars",
+            "def _ensure_adjustment_state",
+            "def _get_adjustment_rows",
+            "def _build_adjustments_frame"
+          ]
+        }
+      ],
+      "tests": {
+        "file": "tests/test_pipeline.py",
+        "count": 8,
+        "focus": [
+          "case-insensitive recipe joins",
+          "supplier contact coverage",
+          "historical ingredient usage correctness",
+          "chain-level forecast totals",
+          "augmented inventory coverage",
+          "non-negative reorder quantities",
+          "complete mapping coverage"
+        ]
+      },
+      "metrics": [
+        {
+          "label": "Forecast metrics",
+          "value": "MAE / RMSE / WAPE",
+          "detail": "Computed through a time-based holdout split in RidgeDemandForecaster.evaluate."
+        },
+        {
+          "label": "Output CSVs",
+          "value": "6",
+          "detail": "Generated lightweight planning outputs."
+        },
+        {
+          "label": "Tests",
+          "value": "8",
+          "detail": "Smoke tests cover workflow integration and inventory invariants."
+        }
+      ],
+      "showcase": {
+        "dashboard": {
+          "src": "/portfolio-artifacts/forecasting/streamlit-dashboard.png",
+          "sizeKb": 249,
+          "alt": "Streamlit central warehouse planning dashboard showing demand, stock issues, reorder spend, and supplier drafts.",
+          "caption": "Actual Streamlit dashboard capture from the forecasting project."
+        },
+        "workflow": [
+          {
+            "label": "Sales history",
+            "detail": "Menu-level demand by date, restaurant, weather, promotions, pricing, and event flags."
+          },
+          {
+            "label": "Ridge forecast",
+            "detail": "The only ML stage: a simple, debuggable demand forecast for menu item quantities."
+          },
+          {
+            "label": "Recipe mapping",
+            "detail": "Forecasted dishes are converted into ingredient requirements using quantity_per_order."
+          },
+          {
+            "label": "Stock health",
+            "detail": "Current stock is compared against usage, reorder levels, and supplier lead time."
+          },
+          {
+            "label": "Supplier plan",
+            "detail": "Items are grouped into reorder recommendations and draft supplier messages."
+          }
+        ],
+        "topMenuForecasts": [
+          {
+            "item": "Kaya Toast Set",
+            "predictedQuantity": 3017.23,
+            "activeRestaurants": 6,
+            "averagePerRestaurant": 502.87
+          },
+          {
+            "item": "Kaya Toast Set",
+            "predictedQuantity": 3014.8,
+            "activeRestaurants": 6,
+            "averagePerRestaurant": 502.47
+          },
+          {
+            "item": "Kaya Toast Set",
+            "predictedQuantity": 2961,
+            "activeRestaurants": 5,
+            "averagePerRestaurant": 592.2
+          },
+          {
+            "item": "Kaya Toast Set",
+            "predictedQuantity": 2959.3,
+            "activeRestaurants": 5,
+            "averagePerRestaurant": 591.86
+          },
+          {
+            "item": "Teh Tarik",
+            "predictedQuantity": 2772.02,
+            "activeRestaurants": 3,
+            "averagePerRestaurant": 924.01
+          },
+          {
+            "item": "Teh Tarik",
+            "predictedQuantity": 2770.98,
+            "activeRestaurants": 3,
+            "averagePerRestaurant": 923.66
+          }
+        ],
+        "topIngredientDemand": [
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 6034.46,
+            "coveredMenuQuantity": 3017.23
+          },
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 6029.6,
+            "coveredMenuQuantity": 3014.8
+          },
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 5922,
+            "coveredMenuQuantity": 2961
+          },
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 5918.6,
+            "coveredMenuQuantity": 2959.3
+          },
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 4850.36,
+            "coveredMenuQuantity": 2425.18
+          },
+          {
+            "ingredient": "Soft-Boiled Eggs",
+            "unit": "pieces",
+            "projectedUsage": 4847.76,
+            "coveredMenuQuantity": 2423.88
+          }
+        ],
+        "criticalAlerts": [
+          {
+            "item": "Rice",
+            "stock": 15.14,
+            "daysOfCover": 0.1,
+            "reorderQuantity": 604.52,
+            "estimatedCost": 362714.7,
+            "supplier": "Supplier B",
+            "status": "critical"
+          },
+          {
+            "item": "Egg",
+            "stock": 9.57,
+            "daysOfCover": 0.01,
+            "reorderQuantity": 5590.2,
+            "estimatedCost": 279510.02,
+            "supplier": "Supplier A",
+            "status": "critical"
+          },
+          {
+            "item": "White Bread",
+            "stock": 12,
+            "daysOfCover": 0.07,
+            "reorderQuantity": 482.62,
+            "estimatedCost": 217176.88,
+            "supplier": "Supplier B",
+            "status": "critical"
+          },
+          {
+            "item": "Rice Flour Jelly",
+            "stock": 20.8,
+            "daysOfCover": 0.25,
+            "reorderQuantity": 231.54,
+            "estimatedCost": 104192.91,
+            "supplier": "Supplier C",
+            "status": "critical"
+          },
+          {
+            "item": "Fries",
+            "stock": 20.73,
+            "daysOfCover": 0.46,
+            "reorderQuantity": 164.41,
+            "estimatedCost": 73983.21,
+            "supplier": "Supplier B",
+            "status": "critical"
+          },
+          {
+            "item": "Beef",
+            "stock": 19.62,
+            "daysOfCover": 0.61,
+            "reorderQuantity": 119.06,
+            "estimatedCost": 71434.1,
+            "supplier": "Supplier B",
+            "status": "critical"
+          }
+        ],
+        "supplierOrders": [
+          {
+            "supplier": "Supplier C",
+            "leadTimeDays": 4,
+            "totalQuantity": 7251.51,
+            "estimatedCost": 857055.25,
+            "itemCount": 16
+          },
+          {
+            "supplier": "Supplier B",
+            "leadTimeDays": 2,
+            "totalQuantity": 11782.08,
+            "estimatedCost": 493956.19,
+            "itemCount": 16
+          },
+          {
+            "supplier": "Supplier A",
+            "leadTimeDays": 1,
+            "totalQuantity": 1378.09,
+            "estimatedCost": 225270,
+            "itemCount": 16
+          }
+        ],
+        "outputPreviews": [
+          {
+            "title": "Menu item forecast",
+            "source": "menu_item_forecast.csv",
+            "rows": [
+              {
+                "item": "Kaya Toast Set",
+                "predictedQuantity": 3017.23,
+                "activeRestaurants": 6,
+                "averagePerRestaurant": 502.87
+              },
+              {
+                "item": "Kaya Toast Set",
+                "predictedQuantity": 3014.8,
+                "activeRestaurants": 6,
+                "averagePerRestaurant": 502.47
+              },
+              {
+                "item": "Kaya Toast Set",
+                "predictedQuantity": 2961,
+                "activeRestaurants": 5,
+                "averagePerRestaurant": 592.2
+              },
+              {
+                "item": "Kaya Toast Set",
+                "predictedQuantity": 2959.3,
+                "activeRestaurants": 5,
+                "averagePerRestaurant": 591.86
+              },
+              {
+                "item": "Teh Tarik",
+                "predictedQuantity": 2772.02,
+                "activeRestaurants": 3,
+                "averagePerRestaurant": 924.01
+              },
+              {
+                "item": "Teh Tarik",
+                "predictedQuantity": 2770.98,
+                "activeRestaurants": 3,
+                "averagePerRestaurant": 923.66
+              }
+            ]
+          },
+          {
+            "title": "Critical stock alerts",
+            "source": "inventory_alerts.csv",
+            "rows": [
+              {
+                "item": "Rice",
+                "stock": 15.14,
+                "daysOfCover": 0.1,
+                "reorderQuantity": 604.52,
+                "estimatedCost": 362714.7,
+                "supplier": "Supplier B",
+                "status": "critical"
+              },
+              {
+                "item": "Egg",
+                "stock": 9.57,
+                "daysOfCover": 0.01,
+                "reorderQuantity": 5590.2,
+                "estimatedCost": 279510.02,
+                "supplier": "Supplier A",
+                "status": "critical"
+              },
+              {
+                "item": "White Bread",
+                "stock": 12,
+                "daysOfCover": 0.07,
+                "reorderQuantity": 482.62,
+                "estimatedCost": 217176.88,
+                "supplier": "Supplier B",
+                "status": "critical"
+              },
+              {
+                "item": "Rice Flour Jelly",
+                "stock": 20.8,
+                "daysOfCover": 0.25,
+                "reorderQuantity": 231.54,
+                "estimatedCost": 104192.91,
+                "supplier": "Supplier C",
+                "status": "critical"
+              },
+              {
+                "item": "Fries",
+                "stock": 20.73,
+                "daysOfCover": 0.46,
+                "reorderQuantity": 164.41,
+                "estimatedCost": 73983.21,
+                "supplier": "Supplier B",
+                "status": "critical"
+              },
+              {
+                "item": "Beef",
+                "stock": 19.62,
+                "daysOfCover": 0.61,
+                "reorderQuantity": 119.06,
+                "estimatedCost": 71434.1,
+                "supplier": "Supplier B",
+                "status": "critical"
+              }
+            ]
+          },
+          {
+            "title": "Supplier reorder summary",
+            "source": "supplier_reorders.csv",
+            "rows": [
+              {
+                "supplier": "Supplier C",
+                "leadTimeDays": 4,
+                "totalQuantity": 7251.51,
+                "estimatedCost": 857055.25,
+                "itemCount": 16
+              },
+              {
+                "supplier": "Supplier B",
+                "leadTimeDays": 2,
+                "totalQuantity": 11782.08,
+                "estimatedCost": 493956.19,
+                "itemCount": 16
+              },
+              {
+                "supplier": "Supplier A",
+                "leadTimeDays": 1,
+                "totalQuantity": 1378.09,
+                "estimatedCost": 225270,
+                "itemCount": 16
+              }
+            ]
+          }
+        ],
+        "appData": {
+          "defaultHorizon": 14,
+          "scenarioMultipliers": {
+            "weather": {
+              "Sunny": 1.042,
+              "Cloudy": 0.984,
+              "Rainy": 0.921
+            },
+            "promotion": 1.918,
+            "event": 1.288
+          },
+          "menuForecast": [
+            {
+              "date": "2025-01-02",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2595.37,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 648.84
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 766.46,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 383.23
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 690.37,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 345.19
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Laksa",
+              "predictedQuantity": 444.75,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 222.38
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 436.26,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 145.42
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Cendol",
+              "predictedQuantity": 351.53,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 175.76
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 252.46,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 63.11
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 181.58,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 181.58
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 103.74,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 103.74
+            },
+            {
+              "date": "2025-01-02",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 85.65,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 28.55
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1879.96,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 469.99
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 1563.98,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 312.8
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1059.27,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 211.85
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 813.26,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 406.63
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 743.95,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 371.98
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 625.88,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 125.18
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 470.93,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 235.47
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 364.2,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 182.1
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 193.24,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 64.41
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 134.99,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 67.5
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 128.37,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 128.37
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Laksa",
+              "predictedQuantity": 118.2,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 118.2
+            },
+            {
+              "date": "2025-01-03",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 22.5,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 22.5
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2772.02,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 924.01
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 2425.18,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 485.04
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 1708.35,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 427.09
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 1628.56,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 407.14
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1616.4,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 404.1
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 686.07,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 228.69
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 533.93,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 177.98
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 475.44,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 475.44
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Laksa",
+              "predictedQuantity": 257.82,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 257.82
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 200.18,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 200.18
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 194.83,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 194.83
+            },
+            {
+              "date": "2025-01-04",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 152.65,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 152.65
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 2961,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 592.2
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1900.78,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 633.59
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 1720.05,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 430.01
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 1580.51,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 526.84
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 626.9,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 208.97
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 548.05,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 137.01
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 524.61,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 524.61
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 511.18,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 255.59
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 378.56,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 189.28
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 331.03,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 331.03
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Laksa",
+              "predictedQuantity": 270.24,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 270.24
+            },
+            {
+              "date": "2025-01-05",
+              "menuItem": "Cendol",
+              "predictedQuantity": 248.82,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 248.82
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 3017.23,
+              "activeRestaurants": 6,
+              "averagePerRestaurant": 502.87
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1531.03,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 510.34
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 780.82,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 390.41
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Cendol",
+              "predictedQuantity": 748.02,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 187
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 688.07,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 344.03
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 367.47,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 122.49
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 293.61,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 97.87
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 241.9,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 120.95
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 176.46,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 176.46
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 150.79,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 50.26
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Laksa",
+              "predictedQuantity": 142.6,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 142.6
+            },
+            {
+              "date": "2025-01-06",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 90.9,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 45.45
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2428.84,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 485.77
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 766.02,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 383.01
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Cendol",
+              "predictedQuantity": 585.68,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 195.23
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 295.45,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 295.45
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 241.44,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 241.44
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 206.44,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 103.22
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 171.84,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 85.92
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 151.92,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 50.64
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 146.99,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 73.5
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 134.83,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 44.94
+            },
+            {
+              "date": "2025-01-07",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 116.99,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 116.99
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1059.61,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 529.81
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1004.86,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 200.97
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 957.49,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 478.75
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 782.19,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 391.1
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 365.17,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 121.72
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 344.59,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 344.59
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 319.31,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 159.66
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Laksa",
+              "predictedQuantity": 299.11,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 149.56
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 282.73,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 282.73
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 204.22,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 204.22
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 192.91,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 96.46
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 186.95,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 93.47
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 134.97,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 44.99
+            },
+            {
+              "date": "2025-01-08",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 35.02,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 35.02
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2594.29,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 648.57
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 766.02,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 383.01
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 689.94,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 344.97
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Laksa",
+              "predictedQuantity": 444.09,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 222.05
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 435.61,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 145.2
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Cendol",
+              "predictedQuantity": 351.1,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 175.55
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 251.59,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 62.9
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 181.14,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 181.14
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 103.52,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 103.52
+            },
+            {
+              "date": "2025-01-09",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 85,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 28.33
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1879.01,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 469.75
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 1562.78,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 312.56
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1057.83,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 211.57
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 812.78,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 406.39
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 743.47,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 371.74
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 624.69,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 124.94
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 469.97,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 234.99
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 363.72,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 181.86
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 192.53,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 64.18
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 134.27,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 67.13
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 128.13,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 128.13
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Laksa",
+              "predictedQuantity": 117.96,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 117.96
+            },
+            {
+              "date": "2025-01-10",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 22.26,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 22.26
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2770.98,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 923.66
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 2423.88,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 484.78
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 1707.31,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 426.83
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 1627.52,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 406.88
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1615.1,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 403.77
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 685.03,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 228.34
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 533.15,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 177.72
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 475.18,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 475.18
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Laksa",
+              "predictedQuantity": 257.56,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 257.56
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 199.92,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 199.92
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 194.57,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 194.57
+            },
+            {
+              "date": "2025-01-11",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 152.39,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 152.39
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 2959.3,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 591.86
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1899.94,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 633.31
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 1718.92,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 429.73
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 1579.39,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 526.46
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 626.05,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 208.68
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 546.93,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 136.73
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 524.32,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 524.32
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 510.34,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 255.17
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 378,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 189
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 330.75,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 330.75
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Laksa",
+              "predictedQuantity": 269.96,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 269.96
+            },
+            {
+              "date": "2025-01-12",
+              "menuItem": "Cendol",
+              "predictedQuantity": 248.53,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 248.53
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 3014.8,
+              "activeRestaurants": 6,
+              "averagePerRestaurant": 502.47
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1530.12,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 510.04
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 780.22,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 390.11
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Cendol",
+              "predictedQuantity": 746.81,
+              "activeRestaurants": 4,
+              "averagePerRestaurant": 186.7
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 687.47,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 343.74
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 366.26,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 122.09
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 292.69,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 97.56
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 241.29,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 120.65
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 176.16,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 176.16
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 149.89,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 49.96
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Laksa",
+              "predictedQuantity": 142.29,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 142.29
+            },
+            {
+              "date": "2025-01-13",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 90.29,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 45.14
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 2427.23,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 485.45
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 765.38,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 382.69
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Cendol",
+              "predictedQuantity": 584.71,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 194.9
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 295.13,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 295.13
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 241.12,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 241.12
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 205.79,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 102.9
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 171.19,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 85.59
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 150.93,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 50.31
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 146.34,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 73.17
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 133.86,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 44.62
+            },
+            {
+              "date": "2025-01-14",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 116.66,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 116.66
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Teh Tarik",
+              "predictedQuantity": 1058.93,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 529.47
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Cendol",
+              "predictedQuantity": 1003.14,
+              "activeRestaurants": 5,
+              "averagePerRestaurant": 200.63
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Iced Lemon Tea",
+              "predictedQuantity": 956.46,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 478.23
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Kaya Toast Set",
+              "predictedQuantity": 781.5,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 390.75
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Chicken Chop",
+              "predictedQuantity": 364.12,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 121.37
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Nasi Lemak",
+              "predictedQuantity": 344.24,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 344.24
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Char Kway Teow",
+              "predictedQuantity": 318.62,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 159.31
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Laksa",
+              "predictedQuantity": 298.42,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 149.21
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Roti Canai",
+              "predictedQuantity": 282.39,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 282.39
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Chicken Rice",
+              "predictedQuantity": 203.88,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 203.88
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Spaghetti Carbonara",
+              "predictedQuantity": 192.22,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 96.11
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Tandoori Chicken",
+              "predictedQuantity": 186.25,
+              "activeRestaurants": 2,
+              "averagePerRestaurant": 93.13
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Mushroom Soup",
+              "predictedQuantity": 133.93,
+              "activeRestaurants": 3,
+              "averagePerRestaurant": 44.64
+            },
+            {
+              "date": "2025-01-15",
+              "menuItem": "Beef Rendang",
+              "predictedQuantity": 34.67,
+              "activeRestaurants": 1,
+              "averagePerRestaurant": 34.67
+            }
+          ],
+          "recipeMapping": [
+            {
+              "menuItem": "laksa",
+              "ingredient": "rice noodles",
+              "quantityPerOrder": 0.15,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "laksa",
+              "ingredient": "fish broth",
+              "quantityPerOrder": 0.3,
+              "unit": "L"
+            },
+            {
+              "menuItem": "laksa",
+              "ingredient": "tamarind",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "laksa",
+              "ingredient": "shrimp paste",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "laksa",
+              "ingredient": "cucumber",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "laksa",
+              "ingredient": "mint",
+              "quantityPerOrder": 0.005,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "spaghetti carbonara",
+              "ingredient": "spaghetti",
+              "quantityPerOrder": 0.12,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "spaghetti carbonara",
+              "ingredient": "eggs",
+              "quantityPerOrder": 1,
+              "unit": "pieces"
+            },
+            {
+              "menuItem": "spaghetti carbonara",
+              "ingredient": "cheese",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "spaghetti carbonara",
+              "ingredient": "beef bacon",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "spaghetti carbonara",
+              "ingredient": "black pepper",
+              "quantityPerOrder": 0.002,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "beef",
+              "quantityPerOrder": 0.18,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "coconut milk",
+              "quantityPerOrder": 0.2,
+              "unit": "L"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "galangal",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "lemongrass",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "spices",
+              "quantityPerOrder": 0.02,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "beef rendang",
+              "ingredient": "chili",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "roti canai",
+              "ingredient": "flour",
+              "quantityPerOrder": 0.1,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "roti canai",
+              "ingredient": "ghee",
+              "quantityPerOrder": 0.02,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "roti canai",
+              "ingredient": "egg",
+              "quantityPerOrder": 1,
+              "unit": "pieces"
+            },
+            {
+              "menuItem": "roti canai",
+              "ingredient": "water",
+              "quantityPerOrder": 0.05,
+              "unit": "L"
+            },
+            {
+              "menuItem": "roti canai",
+              "ingredient": "curry",
+              "quantityPerOrder": 0.1,
+              "unit": "L"
+            },
+            {
+              "menuItem": "cendol",
+              "ingredient": "rice flour jelly",
+              "quantityPerOrder": 0.1,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "cendol",
+              "ingredient": "coconut milk",
+              "quantityPerOrder": 0.15,
+              "unit": "L"
+            },
+            {
+              "menuItem": "cendol",
+              "ingredient": "palm sugar",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "cendol",
+              "ingredient": "red beans",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "flat rice noodles",
+              "quantityPerOrder": 0.15,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "prawns",
+              "quantityPerOrder": 0.08,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "cockles",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "bean sprouts",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "chives",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "char kway teow",
+              "ingredient": "soy sauce",
+              "quantityPerOrder": 0.02,
+              "unit": "L"
+            },
+            {
+              "menuItem": "tandoori chicken",
+              "ingredient": "chicken",
+              "quantityPerOrder": 0.2,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "tandoori chicken",
+              "ingredient": "yogurt",
+              "quantityPerOrder": 0.1,
+              "unit": "L"
+            },
+            {
+              "menuItem": "tandoori chicken",
+              "ingredient": "tandoori masala",
+              "quantityPerOrder": 0.02,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "tandoori chicken",
+              "ingredient": "ginger",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "tandoori chicken",
+              "ingredient": "garlic",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "kaya toast set",
+              "ingredient": "white bread",
+              "quantityPerOrder": 0.1,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "kaya toast set",
+              "ingredient": "kaya",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "kaya toast set",
+              "ingredient": "butter",
+              "quantityPerOrder": 0.02,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "kaya toast set",
+              "ingredient": "soft-boiled eggs",
+              "quantityPerOrder": 2,
+              "unit": "pieces"
+            },
+            {
+              "menuItem": "chicken chop",
+              "ingredient": "chicken thigh",
+              "quantityPerOrder": 0.2,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken chop",
+              "ingredient": "black pepper sauce",
+              "quantityPerOrder": 0.05,
+              "unit": "L"
+            },
+            {
+              "menuItem": "chicken chop",
+              "ingredient": "fries",
+              "quantityPerOrder": 0.15,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken chop",
+              "ingredient": "coleslaw",
+              "quantityPerOrder": 0.1,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "chicken",
+              "quantityPerOrder": 0.18,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "rice",
+              "quantityPerOrder": 0.2,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "ginger",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "garlic",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "chili sauce",
+              "quantityPerOrder": 0.02,
+              "unit": "L"
+            },
+            {
+              "menuItem": "chicken rice",
+              "ingredient": "cucumber",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "teh tarik",
+              "ingredient": "black tea",
+              "quantityPerOrder": 0.005,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "teh tarik",
+              "ingredient": "condensed milk",
+              "quantityPerOrder": 0.05,
+              "unit": "L"
+            },
+            {
+              "menuItem": "teh tarik",
+              "ingredient": "evaporated milk",
+              "quantityPerOrder": 0.05,
+              "unit": "L"
+            },
+            {
+              "menuItem": "iced lemon tea",
+              "ingredient": "black tea",
+              "quantityPerOrder": 0.005,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "iced lemon tea",
+              "ingredient": "lemon",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "iced lemon tea",
+              "ingredient": "sugar syrup",
+              "quantityPerOrder": 0.03,
+              "unit": "L"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "rice",
+              "quantityPerOrder": 0.18,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "coconut milk",
+              "quantityPerOrder": 0.15,
+              "unit": "L"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "sambal",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "anchovies",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "egg",
+              "quantityPerOrder": 1,
+              "unit": "pieces"
+            },
+            {
+              "menuItem": "nasi lemak",
+              "ingredient": "peanuts",
+              "quantityPerOrder": 0.03,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "mushroom soup",
+              "ingredient": "mushrooms",
+              "quantityPerOrder": 0.15,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "mushroom soup",
+              "ingredient": "cream",
+              "quantityPerOrder": 0.1,
+              "unit": "L"
+            },
+            {
+              "menuItem": "mushroom soup",
+              "ingredient": "onion",
+              "quantityPerOrder": 0.05,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "mushroom soup",
+              "ingredient": "garlic",
+              "quantityPerOrder": 0.01,
+              "unit": "kg"
+            },
+            {
+              "menuItem": "mushroom soup",
+              "ingredient": "vegetable broth",
+              "quantityPerOrder": 0.25,
+              "unit": "L"
+            }
+          ],
+          "inventory": [
+            {
+              "item": "Rice",
+              "unit": "kg",
+              "currentStock": 15.14,
+              "reorderLevel": 4.81,
+              "historicalDailyUsage": 153.7136,
+              "forecastDailyUsage": 142.4198,
+              "effectiveDailyUsage": 153.7136,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 600,
+              "status": "critical"
+            },
+            {
+              "item": "Egg",
+              "unit": "pieces",
+              "currentStock": 9.57,
+              "reorderLevel": 5.22,
+              "historicalDailyUsage": 1398.6376,
+              "forecastDailyUsage": 1238.2521,
+              "effectiveDailyUsage": 1398.6376,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "White Bread",
+              "unit": "kg",
+              "currentStock": 12,
+              "reorderLevel": 3.55,
+              "historicalDailyUsage": 148.2564,
+              "forecastDailyUsage": 163.6884,
+              "effectiveDailyUsage": 163.6884,
+              "leadTime": 3,
+              "supplier": "Supplier B",
+              "pricePerUnit": 450,
+              "status": "critical"
+            },
+            {
+              "item": "Rice Flour Jelly",
+              "unit": "kg",
+              "currentStock": 20.8,
+              "reorderLevel": 3.33,
+              "historicalDailyUsage": 83.0033,
+              "forecastDailyUsage": 80.1557,
+              "effectiveDailyUsage": 83.0033,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 450,
+              "status": "critical"
+            },
+            {
+              "item": "Fries",
+              "unit": "kg",
+              "currentStock": 20.73,
+              "reorderLevel": 3.35,
+              "historicalDailyUsage": 44.8124,
+              "forecastDailyUsage": 45.4468,
+              "effectiveDailyUsage": 45.4468,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 450,
+              "status": "critical"
+            },
+            {
+              "item": "Beef",
+              "unit": "kg",
+              "currentStock": 19.62,
+              "reorderLevel": 9.12,
+              "historicalDailyUsage": 32.3892,
+              "forecastDailyUsage": 32.1727,
+              "effectiveDailyUsage": 32.3892,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 600,
+              "status": "critical"
+            },
+            {
+              "item": "Coconut Milk",
+              "unit": "liter",
+              "currentStock": 10.15,
+              "reorderLevel": 5.64,
+              "historicalDailyUsage": 253.1884,
+              "forecastDailyUsage": 249.0639,
+              "effectiveDailyUsage": 253.1884,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Soft-Boiled Eggs",
+              "unit": "liter",
+              "currentStock": 21.08,
+              "reorderLevel": 4.54,
+              "historicalDailyUsage": 2965.1281,
+              "forecastDailyUsage": 3273.7686,
+              "effectiveDailyUsage": 3273.7686,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 6,
+              "status": "critical"
+            },
+            {
+              "item": "Curry",
+              "unit": "kg",
+              "currentStock": 8.36,
+              "reorderLevel": 3.16,
+              "historicalDailyUsage": 78.0668,
+              "forecastDailyUsage": 61.7699,
+              "effectiveDailyUsage": 78.0668,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Vegetable Broth",
+              "unit": "liter",
+              "currentStock": 15.83,
+              "reorderLevel": 6.01,
+              "historicalDailyUsage": 47.7956,
+              "forecastDailyUsage": 47.7718,
+              "effectiveDailyUsage": 47.7956,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Flour",
+              "unit": "kg",
+              "currentStock": 18.38,
+              "reorderLevel": 7.92,
+              "historicalDailyUsage": 78.0668,
+              "forecastDailyUsage": 61.7699,
+              "effectiveDailyUsage": 78.0668,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 600,
+              "status": "critical"
+            },
+            {
+              "item": "Evaporated Milk",
+              "unit": "liter",
+              "currentStock": 23.56,
+              "reorderLevel": 8.53,
+              "historicalDailyUsage": 87.6125,
+              "forecastDailyUsage": 101.1718,
+              "effectiveDailyUsage": 101.1718,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Prawns",
+              "unit": "kg",
+              "currentStock": 10.59,
+              "reorderLevel": 7.87,
+              "historicalDailyUsage": 14.0118,
+              "forecastDailyUsage": 18.1002,
+              "effectiveDailyUsage": 18.1002,
+              "leadTime": 4,
+              "supplier": "Supplier C",
+              "pricePerUnit": 280,
+              "status": "critical"
+            },
+            {
+              "item": "Condensed Milk",
+              "unit": "liter",
+              "currentStock": 27.35,
+              "reorderLevel": 3.8,
+              "historicalDailyUsage": 87.6125,
+              "forecastDailyUsage": 101.1718,
+              "effectiveDailyUsage": 101.1718,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Peanuts",
+              "unit": "kg",
+              "currentStock": 18.38,
+              "reorderLevel": 4.14,
+              "historicalDailyUsage": 18.5391,
+              "forecastDailyUsage": 18.6166,
+              "effectiveDailyUsage": 18.6166,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 280,
+              "status": "critical"
+            },
+            {
+              "item": "Chicken",
+              "unit": "kg",
+              "currentStock": 9.51,
+              "reorderLevel": 9.94,
+              "historicalDailyUsage": 87.8486,
+              "forecastDailyUsage": 82.6037,
+              "effectiveDailyUsage": 87.8486,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Beef Bacon",
+              "unit": "kg",
+              "currentStock": 17.47,
+              "reorderLevel": 8.94,
+              "historicalDailyUsage": 12.6858,
+              "forecastDailyUsage": 11.0443,
+              "effectiveDailyUsage": 12.6858,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Cream",
+              "unit": "liter",
+              "currentStock": 6.42,
+              "reorderLevel": 6.92,
+              "historicalDailyUsage": 19.1183,
+              "forecastDailyUsage": 19.1087,
+              "effectiveDailyUsage": 19.1183,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 450,
+              "status": "critical"
+            },
+            {
+              "item": "Lemon",
+              "unit": "kg",
+              "currentStock": 22.14,
+              "reorderLevel": 8.97,
+              "historicalDailyUsage": 19.2364,
+              "forecastDailyUsage": 24.0972,
+              "effectiveDailyUsage": 24.0972,
+              "leadTime": 2,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Fish Broth",
+              "unit": "liter",
+              "currentStock": 18.1,
+              "reorderLevel": 8.01,
+              "historicalDailyUsage": 38.7033,
+              "forecastDailyUsage": 65.6357,
+              "effectiveDailyUsage": 65.6357,
+              "leadTime": 2,
+              "supplier": "Supplier C",
+              "pricePerUnit": 70,
+              "status": "critical"
+            },
+            {
+              "item": "Ghee",
+              "unit": "kg",
+              "currentStock": 8.83,
+              "reorderLevel": 7.83,
+              "historicalDailyUsage": 15.6134,
+              "forecastDailyUsage": 12.354,
+              "effectiveDailyUsage": 15.6134,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 280,
+              "status": "critical"
+            },
+            {
+              "item": "Bean Sprouts",
+              "unit": "kg",
+              "currentStock": 10.62,
+              "reorderLevel": 6.35,
+              "historicalDailyUsage": 8.7574,
+              "forecastDailyUsage": 11.3126,
+              "effectiveDailyUsage": 11.3126,
+              "leadTime": 2,
+              "supplier": "Supplier C",
+              "pricePerUnit": 450,
+              "status": "critical"
+            },
+            {
+              "item": "Rice Noodles",
+              "unit": "kg",
+              "currentStock": 18.75,
+              "reorderLevel": 4.51,
+              "historicalDailyUsage": 19.3516,
+              "forecastDailyUsage": 32.8179,
+              "effectiveDailyUsage": 32.8179,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 70,
+              "status": "critical"
+            },
+            {
+              "item": "Palm Sugar",
+              "unit": "kg",
+              "currentStock": 21.42,
+              "reorderLevel": 8.63,
+              "historicalDailyUsage": 41.5016,
+              "forecastDailyUsage": 40.0779,
+              "effectiveDailyUsage": 41.5016,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Red Beans",
+              "unit": "kg",
+              "currentStock": 15.29,
+              "reorderLevel": 3.4,
+              "historicalDailyUsage": 41.5016,
+              "forecastDailyUsage": 40.0779,
+              "effectiveDailyUsage": 41.5016,
+              "leadTime": 3,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Yogurt",
+              "unit": "kg",
+              "currentStock": 10.89,
+              "reorderLevel": 4.94,
+              "historicalDailyUsage": 24.8087,
+              "forecastDailyUsage": 27.4777,
+              "effectiveDailyUsage": 27.4777,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "critical"
+            },
+            {
+              "item": "Water",
+              "unit": "liter",
+              "currentStock": 14.06,
+              "reorderLevel": 5.92,
+              "historicalDailyUsage": 39.0334,
+              "forecastDailyUsage": 30.885,
+              "effectiveDailyUsage": 39.0334,
+              "leadTime": 3,
+              "supplier": "Supplier B",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Coleslaw",
+              "unit": "kg",
+              "currentStock": 17.08,
+              "reorderLevel": 8.65,
+              "historicalDailyUsage": 29.8749,
+              "forecastDailyUsage": 30.2979,
+              "effectiveDailyUsage": 30.2979,
+              "leadTime": 3,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Flat Rice Noodles",
+              "unit": "kg",
+              "currentStock": 21.53,
+              "reorderLevel": 7.82,
+              "historicalDailyUsage": 26.2721,
+              "forecastDailyUsage": 33.9379,
+              "effectiveDailyUsage": 33.9379,
+              "leadTime": 2,
+              "supplier": "Supplier B",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Sugar Syrup",
+              "unit": "liter",
+              "currentStock": 7.7,
+              "reorderLevel": 9.89,
+              "historicalDailyUsage": 19.2364,
+              "forecastDailyUsage": 24.0972,
+              "effectiveDailyUsage": 24.0972,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Spaghetti",
+              "unit": "kg",
+              "currentStock": 19.9,
+              "reorderLevel": 3.69,
+              "historicalDailyUsage": 30.446,
+              "forecastDailyUsage": 26.5062,
+              "effectiveDailyUsage": 30.446,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Black Tea",
+              "unit": "kg",
+              "currentStock": 11.07,
+              "reorderLevel": 7.5,
+              "historicalDailyUsage": 11.9673,
+              "forecastDailyUsage": 14.1334,
+              "effectiveDailyUsage": 14.1334,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Mushrooms",
+              "unit": "kg",
+              "currentStock": 19.22,
+              "reorderLevel": 6.12,
+              "historicalDailyUsage": 28.6774,
+              "forecastDailyUsage": 28.6631,
+              "effectiveDailyUsage": 28.6774,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Cucumber",
+              "unit": "kg",
+              "currentStock": 13.19,
+              "reorderLevel": 3.23,
+              "historicalDailyUsage": 10.2422,
+              "forecastDailyUsage": 11.1716,
+              "effectiveDailyUsage": 11.1716,
+              "leadTime": 4,
+              "supplier": "Supplier C",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Sambal",
+              "unit": "kg",
+              "currentStock": 24.82,
+              "reorderLevel": 3.39,
+              "historicalDailyUsage": 18.5391,
+              "forecastDailyUsage": 18.6166,
+              "effectiveDailyUsage": 18.6166,
+              "leadTime": 3,
+              "supplier": "Supplier A",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Kaya",
+              "unit": "kg",
+              "currentStock": 15.88,
+              "reorderLevel": 9.97,
+              "historicalDailyUsage": 44.4769,
+              "forecastDailyUsage": 49.1065,
+              "effectiveDailyUsage": 49.1065,
+              "leadTime": 1,
+              "supplier": "Supplier A",
+              "pricePerUnit": 35,
+              "status": "critical"
+            },
+            {
+              "item": "Eggs",
+              "unit": "pieces",
+              "currentStock": 20.53,
+              "reorderLevel": 7.17,
+              "historicalDailyUsage": 253.7166,
+              "forecastDailyUsage": 220.885,
+              "effectiveDailyUsage": 253.7166,
+              "leadTime": 1,
+              "supplier": "Supplier C",
+              "pricePerUnit": 6,
+              "status": "critical"
+            },
+            {
+              "item": "Chicken Thigh",
+              "unit": "kg",
+              "currentStock": 17.63,
+              "reorderLevel": 5.72,
+              "historicalDailyUsage": 59.7499,
+              "forecastDailyUsage": 60.5957,
+              "effectiveDailyUsage": 60.5957,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 6,
+              "status": "critical"
+            },
+            {
+              "item": "Butter",
+              "unit": "kg",
+              "currentStock": 12.92,
+              "reorderLevel": 6.92,
+              "historicalDailyUsage": 29.6513,
+              "forecastDailyUsage": 32.7377,
+              "effectiveDailyUsage": 32.7377,
+              "leadTime": 1,
+              "supplier": "Supplier C",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Black Pepper Sauce",
+              "unit": "liter",
+              "currentStock": 17.78,
+              "reorderLevel": 7.13,
+              "historicalDailyUsage": 14.9375,
+              "forecastDailyUsage": 15.1489,
+              "effectiveDailyUsage": 15.1489,
+              "leadTime": 3,
+              "supplier": "Supplier B",
+              "pricePerUnit": 35,
+              "status": "critical"
+            },
+            {
+              "item": "Cheese",
+              "unit": "kg",
+              "currentStock": 12.84,
+              "reorderLevel": 5.34,
+              "historicalDailyUsage": 7.6115,
+              "forecastDailyUsage": 6.6265,
+              "effectiveDailyUsage": 7.6115,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Tandoori Masala",
+              "unit": "kg",
+              "currentStock": 14.71,
+              "reorderLevel": 6.96,
+              "historicalDailyUsage": 4.9617,
+              "forecastDailyUsage": 5.4955,
+              "effectiveDailyUsage": 8,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 50,
+              "status": "critical"
+            },
+            {
+              "item": "Anchovies",
+              "unit": "kg",
+              "currentStock": 24.07,
+              "reorderLevel": 3.21,
+              "historicalDailyUsage": 18.5391,
+              "forecastDailyUsage": 18.6166,
+              "effectiveDailyUsage": 18.6166,
+              "leadTime": 2,
+              "supplier": "Supplier C",
+              "pricePerUnit": 40,
+              "status": "critical"
+            },
+            {
+              "item": "Garlic",
+              "unit": "kg",
+              "currentStock": 18.84,
+              "reorderLevel": 6.94,
+              "historicalDailyUsage": 6.5166,
+              "forecastDailyUsage": 6.1947,
+              "effectiveDailyUsage": 6.5166,
+              "leadTime": 3,
+              "supplier": "Supplier A",
+              "pricePerUnit": 6,
+              "status": "critical"
+            },
+            {
+              "item": "Chili Sauce",
+              "unit": "liter",
+              "currentStock": 21.28,
+              "reorderLevel": 7.95,
+              "historicalDailyUsage": 4.2479,
+              "forecastDailyUsage": 3.072,
+              "effectiveDailyUsage": 4.99,
+              "leadTime": 3,
+              "supplier": "Supplier B",
+              "pricePerUnit": 450,
+              "status": "warning"
+            },
+            {
+              "item": "Shrimp Paste",
+              "unit": "kg",
+              "currentStock": 16.57,
+              "reorderLevel": 9.15,
+              "historicalDailyUsage": 1.2901,
+              "forecastDailyUsage": 2.1879,
+              "effectiveDailyUsage": 3.08,
+              "leadTime": 4,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "warning"
+            },
+            {
+              "item": "Soy Sauce",
+              "unit": "liter",
+              "currentStock": 14.49,
+              "reorderLevel": 7.8,
+              "historicalDailyUsage": 3.5029,
+              "forecastDailyUsage": 4.5251,
+              "effectiveDailyUsage": 4.5251,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "warning"
+            },
+            {
+              "item": "Cockles",
+              "unit": "kg",
+              "currentStock": 24.36,
+              "reorderLevel": 7.08,
+              "historicalDailyUsage": 8.7574,
+              "forecastDailyUsage": 11.3126,
+              "effectiveDailyUsage": 11.3126,
+              "leadTime": 1,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "warning"
+            },
+            {
+              "item": "Ginger",
+              "unit": "kg",
+              "currentStock": 14.83,
+              "reorderLevel": 4.92,
+              "historicalDailyUsage": 4.6048,
+              "forecastDailyUsage": 4.2838,
+              "effectiveDailyUsage": 4.6048,
+              "leadTime": 2,
+              "supplier": "Supplier A",
+              "pricePerUnit": 600,
+              "status": "warning"
+            },
+            {
+              "item": "Onion",
+              "unit": "kg",
+              "currentStock": 18.98,
+              "reorderLevel": 9.41,
+              "historicalDailyUsage": 9.5591,
+              "forecastDailyUsage": 9.5544,
+              "effectiveDailyUsage": 9.5591,
+              "leadTime": 1,
+              "supplier": "Supplier C",
+              "pricePerUnit": 6,
+              "status": "warning"
+            },
+            {
+              "item": "Spices",
+              "unit": "kg",
+              "currentStock": 18.37,
+              "reorderLevel": 8.63,
+              "historicalDailyUsage": 3.5988,
+              "forecastDailyUsage": 3.5747,
+              "effectiveDailyUsage": 3.5988,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 600,
+              "status": "healthy"
+            },
+            {
+              "item": "Black Pepper",
+              "unit": "kg",
+              "currentStock": 16.92,
+              "reorderLevel": 7.02,
+              "historicalDailyUsage": 0.5074,
+              "forecastDailyUsage": 0.4418,
+              "effectiveDailyUsage": 0.8,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 250,
+              "status": "healthy"
+            },
+            {
+              "item": "Chili",
+              "unit": "kg",
+              "currentStock": 16.39,
+              "reorderLevel": 3.51,
+              "historicalDailyUsage": 1.7994,
+              "forecastDailyUsage": 1.7874,
+              "effectiveDailyUsage": 1.7994,
+              "leadTime": 2,
+              "supplier": "Supplier B",
+              "pricePerUnit": 450,
+              "status": "healthy"
+            },
+            {
+              "item": "Chives",
+              "unit": "kg",
+              "currentStock": 19.52,
+              "reorderLevel": 8.47,
+              "historicalDailyUsage": 1.7515,
+              "forecastDailyUsage": 2.2625,
+              "effectiveDailyUsage": 3.09,
+              "leadTime": 3,
+              "supplier": "Supplier C",
+              "pricePerUnit": 40,
+              "status": "healthy"
+            },
+            {
+              "item": "Galangal",
+              "unit": "kg",
+              "currentStock": 12.13,
+              "reorderLevel": 6.54,
+              "historicalDailyUsage": 1.7994,
+              "forecastDailyUsage": 1.7874,
+              "effectiveDailyUsage": 2.45,
+              "leadTime": 2,
+              "supplier": "Supplier B",
+              "pricePerUnit": 35,
+              "status": "healthy"
+            },
+            {
+              "item": "Lemongrass",
+              "unit": "kg",
+              "currentStock": 21.91,
+              "reorderLevel": 6.02,
+              "historicalDailyUsage": 1.7994,
+              "forecastDailyUsage": 1.7874,
+              "effectiveDailyUsage": 2.53,
+              "leadTime": 2,
+              "supplier": "Supplier C",
+              "pricePerUnit": 280,
+              "status": "healthy"
+            },
+            {
+              "item": "Mint",
+              "unit": "kg",
+              "currentStock": 13.34,
+              "reorderLevel": 7.21,
+              "historicalDailyUsage": 0.6451,
+              "forecastDailyUsage": 1.0939,
+              "effectiveDailyUsage": 1.18,
+              "leadTime": 1,
+              "supplier": "Supplier A",
+              "pricePerUnit": 40,
+              "status": "healthy"
+            },
+            {
+              "item": "Tamarind",
+              "unit": "kg",
+              "currentStock": 17.96,
+              "reorderLevel": 5.98,
+              "historicalDailyUsage": 1.2901,
+              "forecastDailyUsage": 2.1879,
+              "effectiveDailyUsage": 2.1879,
+              "leadTime": 4,
+              "supplier": "Supplier B",
+              "pricePerUnit": 280,
+              "status": "healthy"
+            }
+          ],
+          "supplierContacts": [
+            {
+              "supplier": "Supplier C",
+              "email": "orders.supplierc@example.com",
+              "contact": "Clara Wijaya",
+              "phone": "+62-811-1000-0003",
+              "leadTimeDays": 4
+            },
+            {
+              "supplier": "Supplier B",
+              "email": "orders.supplierb@example.com",
+              "contact": "Bima Santoso",
+              "phone": "+62-811-1000-0002",
+              "leadTimeDays": 2
+            },
+            {
+              "supplier": "Supplier A",
+              "email": "orders.suppliera@example.com",
+              "contact": "Alicia Pratama",
+              "phone": "+62-811-1000-0001",
+              "leadTimeDays": 1
+            }
+          ],
+          "historicalDemand": [
+            {
+              "date": "2024-10-03",
+              "demand": 6284
+            },
+            {
+              "date": "2024-10-04",
+              "demand": 11439
+            },
+            {
+              "date": "2024-10-05",
+              "demand": 6503
+            },
+            {
+              "date": "2024-10-06",
+              "demand": 9510
+            },
+            {
+              "date": "2024-10-07",
+              "demand": 9158
+            },
+            {
+              "date": "2024-10-08",
+              "demand": 7956
+            },
+            {
+              "date": "2024-10-09",
+              "demand": 9565
+            },
+            {
+              "date": "2024-10-10",
+              "demand": 4259
+            },
+            {
+              "date": "2024-10-11",
+              "demand": 9124
+            },
+            {
+              "date": "2024-10-12",
+              "demand": 8601
+            },
+            {
+              "date": "2024-10-13",
+              "demand": 8566
+            },
+            {
+              "date": "2024-10-14",
+              "demand": 9155
+            },
+            {
+              "date": "2024-10-15",
+              "demand": 5745
+            },
+            {
+              "date": "2024-10-16",
+              "demand": 4570
+            },
+            {
+              "date": "2024-10-17",
+              "demand": 7134
+            },
+            {
+              "date": "2024-10-18",
+              "demand": 14234
+            },
+            {
+              "date": "2024-10-19",
+              "demand": 9479
+            },
+            {
+              "date": "2024-10-20",
+              "demand": 8222
+            },
+            {
+              "date": "2024-10-21",
+              "demand": 8101
+            },
+            {
+              "date": "2024-10-22",
+              "demand": 6817
+            },
+            {
+              "date": "2024-10-23",
+              "demand": 9326
+            },
+            {
+              "date": "2024-10-24",
+              "demand": 7551
+            },
+            {
+              "date": "2024-10-25",
+              "demand": 10586
+            },
+            {
+              "date": "2024-10-26",
+              "demand": 9445
+            },
+            {
+              "date": "2024-10-27",
+              "demand": 6163
+            },
+            {
+              "date": "2024-10-28",
+              "demand": 6565
+            },
+            {
+              "date": "2024-10-29",
+              "demand": 5450
+            },
+            {
+              "date": "2024-10-30",
+              "demand": 8908
+            },
+            {
+              "date": "2024-10-31",
+              "demand": 6918
+            },
+            {
+              "date": "2024-11-01",
+              "demand": 12484
+            },
+            {
+              "date": "2024-11-02",
+              "demand": 8170
+            },
+            {
+              "date": "2024-11-03",
+              "demand": 8395
+            },
+            {
+              "date": "2024-11-04",
+              "demand": 7768
+            },
+            {
+              "date": "2024-11-05",
+              "demand": 9505
+            },
+            {
+              "date": "2024-11-06",
+              "demand": 5750
+            },
+            {
+              "date": "2024-11-07",
+              "demand": 7755
+            },
+            {
+              "date": "2024-11-08",
+              "demand": 11763
+            },
+            {
+              "date": "2024-11-09",
+              "demand": 7077
+            },
+            {
+              "date": "2024-11-10",
+              "demand": 7179
+            },
+            {
+              "date": "2024-11-11",
+              "demand": 9416
+            },
+            {
+              "date": "2024-11-12",
+              "demand": 6123
+            },
+            {
+              "date": "2024-11-13",
+              "demand": 8991
+            },
+            {
+              "date": "2024-11-14",
+              "demand": 4676
+            },
+            {
+              "date": "2024-11-15",
+              "demand": 7854
+            },
+            {
+              "date": "2024-11-16",
+              "demand": 9644
+            },
+            {
+              "date": "2024-11-17",
+              "demand": 6142
+            },
+            {
+              "date": "2024-11-18",
+              "demand": 5638
+            },
+            {
+              "date": "2024-11-19",
+              "demand": 3707
+            },
+            {
+              "date": "2024-11-20",
+              "demand": 6392
+            },
+            {
+              "date": "2024-11-21",
+              "demand": 4954
+            },
+            {
+              "date": "2024-11-22",
+              "demand": 9633
+            },
+            {
+              "date": "2024-11-23",
+              "demand": 11777
+            },
+            {
+              "date": "2024-11-24",
+              "demand": 6837
+            },
+            {
+              "date": "2024-11-25",
+              "demand": 4865
+            },
+            {
+              "date": "2024-11-26",
+              "demand": 4851
+            },
+            {
+              "date": "2024-11-27",
+              "demand": 8664
+            },
+            {
+              "date": "2024-11-28",
+              "demand": 5549
+            },
+            {
+              "date": "2024-11-29",
+              "demand": 7896
+            },
+            {
+              "date": "2024-11-30",
+              "demand": 13637
+            },
+            {
+              "date": "2024-12-01",
+              "demand": 5328
+            },
+            {
+              "date": "2024-12-02",
+              "demand": 5802
+            },
+            {
+              "date": "2024-12-03",
+              "demand": 6807
+            },
+            {
+              "date": "2024-12-04",
+              "demand": 6229
+            },
+            {
+              "date": "2024-12-05",
+              "demand": 11069
+            },
+            {
+              "date": "2024-12-06",
+              "demand": 11533
+            },
+            {
+              "date": "2024-12-07",
+              "demand": 11609
+            },
+            {
+              "date": "2024-12-08",
+              "demand": 7917
+            },
+            {
+              "date": "2024-12-09",
+              "demand": 4621
+            },
+            {
+              "date": "2024-12-10",
+              "demand": 4057
+            },
+            {
+              "date": "2024-12-11",
+              "demand": 8955
+            },
+            {
+              "date": "2024-12-12",
+              "demand": 9811
+            },
+            {
+              "date": "2024-12-13",
+              "demand": 10939
+            },
+            {
+              "date": "2024-12-14",
+              "demand": 17081
+            },
+            {
+              "date": "2024-12-15",
+              "demand": 7375
+            },
+            {
+              "date": "2024-12-16",
+              "demand": 4294
+            },
+            {
+              "date": "2024-12-17",
+              "demand": 3514
+            },
+            {
+              "date": "2024-12-18",
+              "demand": 7711
+            },
+            {
+              "date": "2024-12-19",
+              "demand": 4748
+            },
+            {
+              "date": "2024-12-20",
+              "demand": 9184
+            },
+            {
+              "date": "2024-12-21",
+              "demand": 9319
+            },
+            {
+              "date": "2024-12-22",
+              "demand": 7101
+            },
+            {
+              "date": "2024-12-23",
+              "demand": 6257
+            },
+            {
+              "date": "2024-12-24",
+              "demand": 15591
+            },
+            {
+              "date": "2024-12-25",
+              "demand": 6551
+            },
+            {
+              "date": "2024-12-26",
+              "demand": 11012
+            },
+            {
+              "date": "2024-12-27",
+              "demand": 12132
+            },
+            {
+              "date": "2024-12-28",
+              "demand": 11269
+            },
+            {
+              "date": "2024-12-29",
+              "demand": 8026
+            },
+            {
+              "date": "2024-12-30",
+              "demand": 5860
+            },
+            {
+              "date": "2024-12-31",
+              "demand": 11272
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "name": "menu_item_forecast.csv",
+          "rows": 168,
+          "ship": false
+        },
+        {
+          "name": "ingredient_forecast.csv",
+          "rows": 712,
+          "ship": false
+        },
+        {
+          "name": "inventory_alerts.csv",
+          "rows": 58,
+          "ship": false
+        },
+        {
+          "name": "supplier_reorders.csv",
+          "rows": 3,
+          "ship": false
+        },
+        {
+          "name": "supplier_order_drafts.csv",
+          "rows": 84,
+          "ship": false
+        }
+      ],
+      "excluded": [
+        ".venv",
+        "data/raw",
+        "output/forecast",
+        "__pycache__",
+        ".playwright-cli"
+      ]
+    },
+    "crowdDetection": {
+      "id": "crowd-detection",
+      "title": "CrowdDetection Stage 2",
+      "eyebrow": "Reproducible research engineering",
+      "repoLabel": "project/crawdetection_test + CrowdDetection source",
+      "sourceStatus": "analyzed",
+      "summary": "A modular PyTorch crowd-counting codebase that separates density-map generation, datasets, CSRNet variants, training, evaluation, checkpointing, and report-ready comparison outputs.",
+      "stack": [
+        "numpy",
+        "Pillow",
+        "scipy",
+        "torch",
+        "torchvision",
+        "tqdm"
+      ],
+      "structure": [
+        "configs/advanced_shanghaitech_a.json",
+        "configs/baseline_shanghaitech_a.json",
+        "docs/stage2_alignment.md",
+        "pyproject.toml",
+        "scripts/compare_runs.py",
+        "scripts/evaluate.py",
+        "scripts/generate_density_maps.py",
+        "scripts/train.py",
+        "src/crowd_detection/__init__.py",
+        "src/crowd_detection/config.py",
+        "src/crowd_detection/engine/__init__.py",
+        "src/crowd_detection/engine/trainer.py",
+        "src/crowd_detection/losses.py",
+        "src/crowd_detection/metrics.py",
+        "src/crowd_detection/models/__init__.py",
+        "src/crowd_detection/models/blocks.py",
+        "src/crowd_detection/models/csrnet.py",
+        "src/crowd_detection/utils/__init__.py",
+        "src/crowd_detection/utils/checkpointing.py",
+        "src/crowd_detection/utils/io.py",
+        "src/crowd_detection/utils/reproducibility.py"
+      ],
+      "architecture": [
+        {
+          "label": "Baseline model",
+          "file": "src/crowd_detection/models/csrnet.py",
+          "detail": "CSRNetBaseline uses a VGG16-style frontend, a dilated backend, and a 1-channel density head for fair reproduction."
+        },
+        {
+          "label": "Advanced model",
+          "file": "src/crowd_detection/models/csrnet.py",
+          "detail": "AdvancedCSRNet adds MultiScaleContextBlock, residual dilated blocks, CBAM channel/spatial attention, dropout, batch norm, and a refined density head."
+        },
+        {
+          "label": "Count-consistency loss",
+          "file": "src/crowd_detection/losses.py",
+          "detail": "CrowdCountingLoss combines density MSE with optional L1 count loss after shape matching preserves predicted count mass."
+        },
+        {
+          "label": "Training engine",
+          "file": "src/crowd_detection/engine/trainer.py",
+          "detail": "The trainer handles AMP, gradient clipping, schedulers, checkpoint snapshots, best metrics, sample analysis, and density breakdown exports."
+        }
+      ],
+      "pipeline": [
+        "Generate ShanghaiTech density maps from point annotations with KDTree-informed Gaussian smoothing.",
+        "Load count-preserving resized/downsampled density maps through ShanghaiTechCrowdDataset.",
+        "Train CSRNetBaseline and AdvancedCSRNet from JSON configs with identical split structure.",
+        "Track MAE, RMSE, PSNR, SSIM, density loss, count loss, and sample-level density bands.",
+        "Compare baseline and advanced output folders into report-ready metric tables."
+      ],
+      "configComparison": {
+        "baseline": {
+          "model": "csrnet_baseline",
+          "optimizer": "sgd",
+          "lr": 0.000001,
+          "countWeight": 0,
+          "amp": false,
+          "epochs": 100
+        },
+        "advanced": {
+          "model": "advanced_csrnet",
+          "optimizer": "adamw",
+          "lr": 0.00001,
+          "countWeight": 0.1,
+          "amp": true,
+          "epochs": 120,
+          "contextRates": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "attentionReduction": 16,
+          "dropout": 0.1
+        }
+      },
+      "codeSignals": [
+        {
+          "file": "models/csrnet.py",
+          "symbols": [
+            "def make_layers",
+            "class CSRNetBackbone",
+            "def __init__",
+            "def _load_vgg16_weights",
+            "def forward",
+            "class CSRNetBaseline",
+            "def __init__",
+            "def _initialize_weights",
+            "def forward",
+            "class AdvancedCSRNet",
+            "def __init__",
+            "def _initialize_weights",
+            "def forward",
+            "def build_model"
+          ]
+        },
+        {
+          "file": "models/blocks.py",
+          "symbols": [
+            "class ConvBNReLU",
+            "def __init__",
+            "class ChannelAttention",
+            "def __init__",
+            "def forward",
+            "class SpatialAttention",
+            "def __init__",
+            "def forward",
+            "class CBAMBlock",
+            "def __init__",
+            "def forward",
+            "class ResidualDilatedBlock",
+            "def __init__",
+            "def forward",
+            "class MultiScaleContextBlock",
+            "def __init__",
+            "def forward"
+          ]
+        },
+        {
+          "file": "losses.py",
+          "symbols": [
+            "def match_tensor_shape",
+            "class LossBreakdown",
+            "class CrowdCountingLoss",
+            "def __init__",
+            "def forward"
+          ]
+        },
+        {
+          "file": "engine/trainer.py",
+          "symbols": [
+            "def build_optimizer",
+            "def build_scheduler",
+            "def _move_batch_to_device",
+            "def run_epoch",
+            "def train_model",
+            "def evaluate_checkpoint"
+          ]
+        }
+      ],
+      "metrics": [
+        {
+          "label": "Baseline MAE",
+          "value": 286.02,
+          "detail": "Stage2 stable v3 best metrics."
+        },
+        {
+          "label": "Advanced MAE",
+          "value": 128.06,
+          "detail": "Stage2 stable v3 best metrics."
+        },
+        {
+          "label": "High-density MAE",
+          "value": 140.09,
+          "detail": "Baseline high-density MAE was 316.13."
+        },
+        {
+          "label": "Advanced RMSE",
+          "value": 196.54,
+          "detail": "Reported from repository output JSON, not invented."
+        }
+      ],
+      "showcase": {
+        "sample": {
+          "imageId": "IMG_90",
+          "image": {
+            "src": "/portfolio-artifacts/crowd-detection/IMG_90.jpg",
+            "sizeKb": 192,
+            "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+          },
+          "density": {
+            "src": "/portfolio-artifacts/crowd-detection/IMG_90-density.svg",
+            "sizeKb": 182,
+            "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+          },
+          "groundTruth": 2244.15,
+          "baselinePrediction": 144.85,
+          "advancedPrediction": 1723.81,
+          "baselineError": 2099.3,
+          "advancedError": 520.34,
+          "relativeError": 0.232,
+          "densityBand": "high",
+          "improvement": 1578.96
+        },
+        "samples": [
+          {
+            "imageId": "IMG_90",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_90.jpg",
+              "sizeKb": 192,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_90-density.svg",
+              "sizeKb": 182,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 2244.15,
+            "baselinePrediction": 144.85,
+            "advancedPrediction": 1723.81,
+            "baselineError": 2099.3,
+            "advancedError": 520.34,
+            "relativeError": 0.232,
+            "densityBand": "high",
+            "improvement": 1578.96
+          },
+          {
+            "imageId": "IMG_117",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_117.jpg",
+              "sizeKb": 215,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_117-density.svg",
+              "sizeKb": 273,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1588.81,
+            "baselinePrediction": 169.35,
+            "advancedPrediction": 1665.65,
+            "baselineError": 1419.46,
+            "advancedError": 76.84,
+            "relativeError": 0.048,
+            "densityBand": "high",
+            "improvement": 1342.62
+          },
+          {
+            "imageId": "IMG_150",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_150.jpg",
+              "sizeKb": 110,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_150-density.svg",
+              "sizeKb": 264,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1293.51,
+            "baselinePrediction": 85.21,
+            "advancedPrediction": 1283.8,
+            "baselineError": 1208.3,
+            "advancedError": 9.71,
+            "relativeError": 0.008,
+            "densityBand": "high",
+            "improvement": 1198.59
+          },
+          {
+            "imageId": "IMG_172",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_172.jpg",
+              "sizeKb": 115,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_172-density.svg",
+              "sizeKb": 119,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1167.05,
+            "baselinePrediction": 108.15,
+            "advancedPrediction": 1224.91,
+            "baselineError": 1058.9,
+            "advancedError": 57.85,
+            "relativeError": 0.05,
+            "densityBand": "high",
+            "improvement": 1001.05
+          },
+          {
+            "imageId": "IMG_121",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_121.jpg",
+              "sizeKb": 172,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_121-density.svg",
+              "sizeKb": 182,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1204.23,
+            "baselinePrediction": 217.95,
+            "advancedPrediction": 1101.19,
+            "baselineError": 986.29,
+            "advancedError": 103.05,
+            "relativeError": 0.086,
+            "densityBand": "high",
+            "improvement": 883.24
+          },
+          {
+            "imageId": "IMG_2",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_2.jpg",
+              "sizeKb": 243,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_2-density.svg",
+              "sizeKb": 243,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1106.23,
+            "baselinePrediction": 220.05,
+            "advancedPrediction": 1061.96,
+            "baselineError": 886.17,
+            "advancedError": 44.27,
+            "relativeError": 0.04,
+            "densityBand": "high",
+            "improvement": 841.9
+          },
+          {
+            "imageId": "IMG_115",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_115.jpg",
+              "sizeKb": 84,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_115-density.svg",
+              "sizeKb": 609,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1183.64,
+            "baselinePrediction": 73.83,
+            "advancedPrediction": 900.95,
+            "baselineError": 1109.81,
+            "advancedError": 282.69,
+            "relativeError": 0.239,
+            "densityBand": "high",
+            "improvement": 827.12
+          },
+          {
+            "imageId": "IMG_17",
+            "image": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_17.jpg",
+              "sizeKb": 142,
+              "alt": "ShanghaiTech dense crowd evaluation sample used for baseline and advanced model comparison."
+            },
+            "density": {
+              "src": "/portfolio-artifacts/crowd-detection/IMG_17-density.svg",
+              "sizeKb": 204,
+              "alt": "Downsampled density-map visualization generated from the evaluation density cache."
+            },
+            "groundTruth": 1147.5,
+            "baselinePrediction": 154.76,
+            "advancedPrediction": 1337.07,
+            "baselineError": 992.74,
+            "advancedError": 189.57,
+            "relativeError": 0.165,
+            "densityBand": "high",
+            "improvement": 803.17
+          }
+        ],
+        "metricComparison": [
+          {
+            "label": "MAE",
+            "baseline": 286.02,
+            "advanced": 128.06,
+            "lowerIsBetter": true
+          },
+          {
+            "label": "RMSE",
+            "baseline": 438.04,
+            "advanced": 196.54,
+            "lowerIsBetter": true
+          },
+          {
+            "label": "High-density MAE",
+            "baseline": 316.13,
+            "advanced": 140.09,
+            "lowerIsBetter": true
+          },
+          {
+            "label": "SSIM",
+            "baseline": 0.334,
+            "advanced": 0.231,
+            "lowerIsBetter": false
+          }
+        ],
+        "trainingHistory": [
+          {
+            "epoch": 1,
+            "baselineMae": 287.11,
+            "advancedMae": 316.63
+          },
+          {
+            "epoch": 2,
+            "baselineMae": 286.88,
+            "advancedMae": 181.08
+          },
+          {
+            "epoch": 3,
+            "baselineMae": 286.65,
+            "advancedMae": 195.29
+          },
+          {
+            "epoch": 4,
+            "baselineMae": 286.42,
+            "advancedMae": 170.05
+          },
+          {
+            "epoch": 5,
+            "baselineMae": 286.29,
+            "advancedMae": 139.27
+          },
+          {
+            "epoch": 6,
+            "baselineMae": 286.16,
+            "advancedMae": 237.54
+          },
+          {
+            "epoch": 7,
+            "baselineMae": 286.02,
+            "advancedMae": 133.13
+          },
+          {
+            "epoch": 8,
+            "baselineMae": 285.88,
+            "advancedMae": 145.85
+          },
+          {
+            "epoch": 9,
+            "baselineMae": null,
+            "advancedMae": 136.73
+          },
+          {
+            "epoch": 10,
+            "baselineMae": null,
+            "advancedMae": 130.34
+          },
+          {
+            "epoch": 11,
+            "baselineMae": null,
+            "advancedMae": 128.06
+          },
+          {
+            "epoch": 12,
+            "baselineMae": null,
+            "advancedMae": 169.18
+          }
+        ],
+        "densityBreakdown": [
+          {
+            "band": "low",
+            "baselineMae": 0,
+            "advancedMae": 0,
+            "sampleCount": 0
+          },
+          {
+            "band": "medium",
+            "baselineMae": 77.89,
+            "advancedMae": 44.89,
+            "sampleCount": 23
+          },
+          {
+            "band": "high",
+            "baselineMae": 316.13,
+            "advancedMae": 140.09,
+            "sampleCount": 159
+          }
+        ],
+        "workflow": [
+          {
+            "label": "Density-map targets",
+            "detail": "Point annotations are converted into count-preserving density maps."
+          },
+          {
+            "label": "Baseline reproduction",
+            "detail": "CSRNetBaseline creates a fair dilated-backend reference point."
+          },
+          {
+            "label": "Advanced context model",
+            "detail": "Multi-scale context and attention are added to handle occlusion and scale variation."
+          },
+          {
+            "label": "Evaluation outputs",
+            "detail": "MAE, RMSE, sample analysis, and density-band breakdowns are exported for comparison."
+          }
+        ]
+      },
+      "artifacts": [
+        {
+          "name": "best_metrics.json",
+          "path": "outputs/single_notebook_stage2/stage2_stable_v3/*/best_metrics.json",
+          "ship": false
+        },
+        {
+          "name": "density_breakdown.json",
+          "path": "outputs/single_notebook_stage2/stage2_stable_v3/*/density_breakdown.json",
+          "ship": false
+        },
+        {
+          "name": "legacy_stage2_advanced_best.pt",
+          "path": "project/crawdetection_test/artifacts/pretrained",
+          "ship": false
+        },
+        {
+          "name": "shanghaitech.zip",
+          "path": "project/crawdetection_test",
+          "ship": false
+        }
+      ],
+      "excluded": [
+        ".venv-crowd",
+        "data/ShanghaiTech",
+        "data/density_cache",
+        "outputs",
+        "artifacts/pretrained",
+        "shanghaitech.zip"
+      ]
+    },
+    "deepfake": {
+      "id": "deepfake",
+      "title": "Deepfake Detection",
+      "eyebrow": "Notebook-to-artifact computer vision experiment",
+      "repoLabel": "project/deepfake",
+      "sourceStatus": "analyzed",
+      "summary": "A notebook-based video deepfake detection experiment that builds a FaceForensics++ C23 frame index, splits by video to avoid leakage, trains EfficientNet-B0 and ResNet50, evaluates frame/video metrics, and exports a Gradio inference notebook.",
+      "stack": [
+        "PyTorch",
+        "timm",
+        "OpenCV",
+        "pandas",
+        "scikit-learn",
+        "Gradio"
+      ],
+      "structure": [
+        "artifacts/cm_video_thr.png",
+        "artifacts/eval_report.json",
+        "artifacts/model_final_meta.json",
+        "artifacts/roc_video.png",
+        "artifacts/train_frames.csv",
+        "artifacts/val_frames.csv",
+        "artifacts/val_video_scores.csv",
+        "deepfake_video_ffpp_c23.ipynb",
+        "metrics_efficientnet_b0.csv",
+        "metrics_resnet50.csv",
+        "ui.ipynb"
+      ],
+      "architecture": [
+        {
+          "label": "Frame sampling",
+          "file": "deepfake_video_ffpp_c23.ipynb",
+          "detail": "Videos are converted into frame-level rows using evenly spaced frame indices; large frame caches are avoided."
+        },
+        {
+          "label": "Anti-leakage split",
+          "file": "artifacts/train_frames.csv + artifacts/val_frames.csv",
+          "detail": "GroupShuffleSplit separates train and validation by video_id so frames from the same video do not appear in both splits."
+        },
+        {
+          "label": "Model experiments",
+          "file": "metrics_efficientnet_b0.csv + metrics_resnet50.csv",
+          "detail": "EfficientNet-B0 and ResNet50 are trained with BCEWithLogitsLoss and compared using frame-level and video-level metrics."
+        },
+        {
+          "label": "Inference UI",
+          "file": "ui.ipynb",
+          "detail": "The Gradio UI loads model_final_meta.json and model_final.pt, samples frames, optionally crops faces, averages p(fake), and applies the tuned threshold."
+        }
+      ],
+      "pipeline": [
+        "Find video files and infer real/fake labels from FaceForensics++ folder structure.",
+        "Sample frame indices per video and persist train/validation CSVs.",
+        "Decode frames lazily with OpenCV and optionally crop the largest detected face.",
+        "Train EfficientNet-B0 and ResNet50 with frame-level binary classification.",
+        "Aggregate frame probabilities by video, tune a threshold by balanced accuracy, and export evaluation artifacts."
+      ],
+      "notebooks": [
+        {
+          "file": "deepfake_video_ffpp_c23.ipynb",
+          "cells": 40,
+          "headings": [
+            "Deepfake Video Detector (FaceForensics++ C23) — End‑to‑End",
+            "0. Install dependencies",
+            "1. Imports, device, and reproducibility",
+            "2. Download FaceForensics++ C23 from Kaggle (kagglehub)",
+            "3. Dataset explorer (NO assumptions)",
+            "4. Build labeled video index (real vs fake)",
+            "5",
+            "6. Frame sampling plan (create frame-level samples, split by video)",
+            "7. Split by video_id (anti leakage)",
+            "8. Dataset & Dataloader (decode a specific frame)",
+            "9",
+            "10"
+          ],
+          "codeSignals": [
+            "def seed_everything",
+            "def list_some",
+            "def find_videos",
+            "def label_from_path",
+            "def build_ffpp_index",
+            "def get_total_frames",
+            "def sample_frame_indices",
+            "def build_and_save_split",
+            "def _find_haar",
+            "def crop_biggest_face_pil",
+            "def read_frame_at",
+            "class FFPPFrameDataset",
+            "def __init__",
+            "def __len__",
+            "def __getitem__",
+            "def make_model"
+          ]
+        },
+        {
+          "file": "ui.ipynb",
+          "cells": 6,
+          "headings": [],
+          "codeSignals": [
+            "def load_trained_model",
+            "def _init_mtcnn",
+            "def _init_haar",
+            "def crop_biggest_face_pil",
+            "def sample_indices",
+            "def predict_video",
+            "def _get_path",
+            "def ui_predict"
+          ]
+        }
+      ],
+      "codeSignals": [
+        {
+          "file": "deepfake_video_ffpp_c23.ipynb",
+          "symbols": [
+            "def seed_everything",
+            "def list_some",
+            "def find_videos",
+            "def label_from_path",
+            "def build_ffpp_index",
+            "def get_total_frames",
+            "def sample_frame_indices",
+            "def build_and_save_split",
+            "def _find_haar",
+            "def crop_biggest_face_pil",
+            "def read_frame_at",
+            "class FFPPFrameDataset",
+            "def __init__",
+            "def __len__",
+            "def __getitem__",
+            "def make_model"
+          ]
+        },
+        {
+          "file": "ui.ipynb",
+          "symbols": [
+            "def load_trained_model",
+            "def _init_mtcnn",
+            "def _init_haar",
+            "def crop_biggest_face_pil",
+            "def sample_indices",
+            "def predict_video",
+            "def _get_path",
+            "def ui_predict"
+          ]
+        }
+      ],
+      "metrics": [
+        {
+          "label": "Final model",
+          "value": "resnet50",
+          "detail": "checkpoint: best_resnet50.pt"
+        },
+        {
+          "label": "Video AUC",
+          "value": 0.9975,
+          "detail": "From artifacts/eval_report.json."
+        },
+        {
+          "label": "Video F1",
+          "value": 0.96,
+          "detail": "From artifacts/eval_report.json."
+        },
+        {
+          "label": "Threshold",
+          "value": 0.61,
+          "detail": "16 sampled frames at inference."
+        }
+      ],
+      "showcase": {
+        "plots": [
+          {
+            "src": "/portfolio-artifacts/deepfake/roc-video.png",
+            "sizeKb": 37,
+            "title": "Video-level ROC",
+            "alt": "Video-level ROC curve for the ResNet50 deepfake detector."
+          },
+          {
+            "src": "/portfolio-artifacts/deepfake/confusion-video-threshold.png",
+            "sizeKb": 33,
+            "title": "Thresholded confusion matrix",
+            "alt": "Video-level confusion matrix at tuned threshold for the ResNet50 deepfake detector."
+          }
+        ],
+        "modelComparison": [
+          {
+            "model": "ResNet50",
+            "epoch": 9,
+            "trainLoss": 0.0247,
+            "frameAuc": 0.9911,
+            "frameF1": 0.9518,
+            "videoAuc": 0.9975,
+            "videoF1": 0.96,
+            "videoAcc": 0.9583,
+            "threshold": 0.61
+          },
+          {
+            "model": "EfficientNet-B0",
+            "epoch": 9,
+            "trainLoss": 0.0201,
+            "frameAuc": 0.9831,
+            "frameF1": 0.925,
+            "videoAuc": 0.9816,
+            "videoF1": 0.9322,
+            "videoAcc": 0.9333,
+            "threshold": 0.28
+          }
+        ],
+        "inferenceExamples": [
+          {
+            "video": "talking_against_wall / PRBCE28Z",
+            "label": "fake",
+            "probabilityFake": 1,
+            "decision": "fake"
+          },
+          {
+            "video": "original / 810",
+            "label": "real",
+            "probabilityFake": 0,
+            "decision": "real"
+          },
+          {
+            "video": "original / 678",
+            "label": "real",
+            "probabilityFake": 0.608,
+            "decision": "real"
+          }
+        ],
+        "appData": {
+          "threshold": 0.61,
+          "defaultFrames": 16,
+          "modelName": "resnet50",
+          "valMetrics": {
+            "accuracy": 0.9583,
+            "f1": 0.96,
+            "auc": 0.9975
+          },
+          "videoScores": [
+            {
+              "video": "outside_talking_still_laughing / FW94AIMJ",
+              "label": "FAKE",
+              "probabilityFake": 0.9994,
+              "decision": "FAKE"
+            },
+            {
+              "video": "hugging_happy / 1JCLEEBQ",
+              "label": "FAKE",
+              "probabilityFake": 0.9976,
+              "decision": "FAKE"
+            },
+            {
+              "video": "podium_speech_happy / 9TDCEK1Q",
+              "label": "FAKE",
+              "probabilityFake": 0.9995,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_street_outside_angry / 6KUOFMZW",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "meeting_serious / V53E3RVB",
+              "label": "FAKE",
+              "probabilityFake": 0.9987,
+              "decision": "FAKE"
+            },
+            {
+              "video": "talking_against_wall / PRBCE28Z",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "exit_phone_room / B62WCGUN",
+              "label": "FAKE",
+              "probabilityFake": 0.9565,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_indoor_hall_disgust / QRCD27P8",
+              "label": "FAKE",
+              "probabilityFake": 0.9554,
+              "decision": "FAKE"
+            },
+            {
+              "video": "exit_phone_room / YP7MGDQ6",
+              "label": "FAKE",
+              "probabilityFake": 0.9995,
+              "decision": "FAKE"
+            },
+            {
+              "video": "talking_against_wall / C3K20JOL",
+              "label": "FAKE",
+              "probabilityFake": 0.9999,
+              "decision": "FAKE"
+            },
+            {
+              "video": "secret_conversation / WIZ7GKOD",
+              "label": "FAKE",
+              "probabilityFake": 0.9688,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walk_down_hall_angry / Z7EWFA0P",
+              "label": "FAKE",
+              "probabilityFake": 0.9999,
+              "decision": "FAKE"
+            },
+            {
+              "video": "talking_against_wall / J54W3PV1",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "outside_talking_still_laughing / CP5HFV3K",
+              "label": "FAKE",
+              "probabilityFake": 0.9996,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_street_outside_angry / B41GFUV2",
+              "label": "FAKE",
+              "probabilityFake": 0.9654,
+              "decision": "FAKE"
+            },
+            {
+              "video": "kitchen_still / NJEO6L5O",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "podium_speech_happy / C50CSOEX",
+              "label": "FAKE",
+              "probabilityFake": 0.9988,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_outside_cafe_disgusted / A1OSUJE9",
+              "label": "FAKE",
+              "probabilityFake": 0.9106,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_indoor_hall_disgust / 6TEK3ZX0",
+              "label": "FAKE",
+              "probabilityFake": 0.9967,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_street_outside_angry / 6TEK3ZX0",
+              "label": "FAKE",
+              "probabilityFake": 0.9992,
+              "decision": "FAKE"
+            },
+            {
+              "video": "hugging_happy / 3FRJCJ0V",
+              "label": "FAKE",
+              "probabilityFake": 0.9997,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_and_outside_surprised / B014BKVO",
+              "label": "FAKE",
+              "probabilityFake": 0.9985,
+              "decision": "FAKE"
+            },
+            {
+              "video": "talking_angry_couch / 5C1OMK8W",
+              "label": "FAKE",
+              "probabilityFake": 0.9975,
+              "decision": "FAKE"
+            },
+            {
+              "video": "outside_talking_pan_laughing / X5FNCYON",
+              "label": "FAKE",
+              "probabilityFake": 0.95,
+              "decision": "FAKE"
+            },
+            {
+              "video": "exit_phone_room / 0YRBHIKG",
+              "label": "FAKE",
+              "probabilityFake": 0.9995,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walk_down_hall_angry / F7U8UY7V",
+              "label": "FAKE",
+              "probabilityFake": 0.9996,
+              "decision": "FAKE"
+            },
+            {
+              "video": "talking_angry_couch / W1DEM0XM",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "hugging_happy / TEV3HIHZ",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_street_outside_angry / YR5OVD4S",
+              "label": "FAKE",
+              "probabilityFake": 0.9881,
+              "decision": "FAKE"
+            },
+            {
+              "video": "walking_down_street_outside_angry / MA71PDNV",
+              "label": "FAKE",
+              "probabilityFake": 0.9807,
+              "decision": "FAKE"
+            },
+            {
+              "video": "podium_speech_happy / PQ41U3IJ",
+              "label": "FAKE",
+              "probabilityFake": 0.9929,
+              "decision": "FAKE"
+            },
+            {
+              "video": "kitchen_still / WX836VLY",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "kitchen_still / 8BC35RFU",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 054_071",
+              "label": "FAKE",
+              "probabilityFake": 0.9992,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 103_082",
+              "label": "FAKE",
+              "probabilityFake": 0.6818,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 107_109",
+              "label": "FAKE",
+              "probabilityFake": 0.9854,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 198_106",
+              "label": "FAKE",
+              "probabilityFake": 0.7314,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 244_822",
+              "label": "FAKE",
+              "probabilityFake": 0.7596,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 245_157",
+              "label": "FAKE",
+              "probabilityFake": 0.8865,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 265_475",
+              "label": "FAKE",
+              "probabilityFake": 0.7403,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 310_196",
+              "label": "FAKE",
+              "probabilityFake": 0.9651,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 324_356",
+              "label": "FAKE",
+              "probabilityFake": 0.9655,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 350_349",
+              "label": "FAKE",
+              "probabilityFake": 0.3301,
+              "decision": "REAL"
+            },
+            {
+              "video": "Deepfakes / 433_498",
+              "label": "FAKE",
+              "probabilityFake": 0.9779,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 450_533",
+              "label": "FAKE",
+              "probabilityFake": 0.9721,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 453_402",
+              "label": "FAKE",
+              "probabilityFake": 0.9576,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 465_482",
+              "label": "FAKE",
+              "probabilityFake": 0.9073,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 491_226",
+              "label": "FAKE",
+              "probabilityFake": 0.9152,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 555_516",
+              "label": "FAKE",
+              "probabilityFake": 0.9962,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 605_591",
+              "label": "FAKE",
+              "probabilityFake": 0.9832,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 608_675",
+              "label": "FAKE",
+              "probabilityFake": 0.9957,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 621_546",
+              "label": "FAKE",
+              "probabilityFake": 0.9994,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 654_648",
+              "label": "FAKE",
+              "probabilityFake": 0.7848,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 666_656",
+              "label": "FAKE",
+              "probabilityFake": 0.8865,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 728_673",
+              "label": "FAKE",
+              "probabilityFake": 0.9878,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 731_741",
+              "label": "FAKE",
+              "probabilityFake": 0.878,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 818_820",
+              "label": "FAKE",
+              "probabilityFake": 0.9965,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 852_834",
+              "label": "FAKE",
+              "probabilityFake": 0.997,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 893_913",
+              "label": "FAKE",
+              "probabilityFake": 1,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 897_969",
+              "label": "FAKE",
+              "probabilityFake": 0.3622,
+              "decision": "REAL"
+            },
+            {
+              "video": "Deepfakes / 922_898",
+              "label": "FAKE",
+              "probabilityFake": 0.8433,
+              "decision": "FAKE"
+            },
+            {
+              "video": "Deepfakes / 930_763",
+              "label": "FAKE",
+              "probabilityFake": 0.9995,
+              "decision": "FAKE"
+            },
+            {
+              "video": "original / 002",
+              "label": "REAL",
+              "probabilityFake": 0.0009,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 009",
+              "label": "REAL",
+              "probabilityFake": 0.0749,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 039",
+              "label": "REAL",
+              "probabilityFake": 0.0406,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 055",
+              "label": "REAL",
+              "probabilityFake": 0.5543,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 082",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 101",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 120",
+              "label": "REAL",
+              "probabilityFake": 0.2042,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 174",
+              "label": "REAL",
+              "probabilityFake": 0.0665,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 208",
+              "label": "REAL",
+              "probabilityFake": 0.2728,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 215",
+              "label": "REAL",
+              "probabilityFake": 0.0068,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 227",
+              "label": "REAL",
+              "probabilityFake": 0.1209,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 239",
+              "label": "REAL",
+              "probabilityFake": 0.013,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 244",
+              "label": "REAL",
+              "probabilityFake": 0.0445,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 247",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 249",
+              "label": "REAL",
+              "probabilityFake": 0.0001,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 256",
+              "label": "REAL",
+              "probabilityFake": 0.0241,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 318",
+              "label": "REAL",
+              "probabilityFake": 0.0582,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 355",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 359",
+              "label": "REAL",
+              "probabilityFake": 0.0001,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 370",
+              "label": "REAL",
+              "probabilityFake": 0.0007,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 381",
+              "label": "REAL",
+              "probabilityFake": 0.0002,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 408",
+              "label": "REAL",
+              "probabilityFake": 0.0998,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 428",
+              "label": "REAL",
+              "probabilityFake": 0.0063,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 432",
+              "label": "REAL",
+              "probabilityFake": 0.0091,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 439",
+              "label": "REAL",
+              "probabilityFake": 0.3584,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 451",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 464",
+              "label": "REAL",
+              "probabilityFake": 0.6056,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 468",
+              "label": "REAL",
+              "probabilityFake": 0.3756,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 519",
+              "label": "REAL",
+              "probabilityFake": 0.1427,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 542",
+              "label": "REAL",
+              "probabilityFake": 0.1403,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 554",
+              "label": "REAL",
+              "probabilityFake": 0.0264,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 575",
+              "label": "REAL",
+              "probabilityFake": 0.0054,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 631",
+              "label": "REAL",
+              "probabilityFake": 0.0001,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 644",
+              "label": "REAL",
+              "probabilityFake": 0.0008,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 678",
+              "label": "REAL",
+              "probabilityFake": 0.608,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 714",
+              "label": "REAL",
+              "probabilityFake": 0.0003,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 799",
+              "label": "REAL",
+              "probabilityFake": 0.0022,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 800",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 802",
+              "label": "REAL",
+              "probabilityFake": 0.0002,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 810",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 811",
+              "label": "REAL",
+              "probabilityFake": 0.1752,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 827",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 836",
+              "label": "REAL",
+              "probabilityFake": 0.0005,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 867",
+              "label": "REAL",
+              "probabilityFake": 0.0011,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 868",
+              "label": "REAL",
+              "probabilityFake": 0.103,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 884",
+              "label": "REAL",
+              "probabilityFake": 0,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 893",
+              "label": "REAL",
+              "probabilityFake": 0.0412,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 900",
+              "label": "REAL",
+              "probabilityFake": 0.0034,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 914",
+              "label": "REAL",
+              "probabilityFake": 0.0002,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 924",
+              "label": "REAL",
+              "probabilityFake": 0.0048,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 948",
+              "label": "REAL",
+              "probabilityFake": 0.1139,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 963",
+              "label": "REAL",
+              "probabilityFake": 0.0003,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 973",
+              "label": "REAL",
+              "probabilityFake": 0.0001,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 974",
+              "label": "REAL",
+              "probabilityFake": 0.0009,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 977",
+              "label": "REAL",
+              "probabilityFake": 0.0232,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 989",
+              "label": "REAL",
+              "probabilityFake": 0.0508,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 991",
+              "label": "REAL",
+              "probabilityFake": 0.1125,
+              "decision": "REAL"
+            },
+            {
+              "video": "original / 995",
+              "label": "REAL",
+              "probabilityFake": 0.0235,
+              "decision": "REAL"
+            }
+          ]
+        },
+        "splitSummary": [
+          {
+            "label": "Train frames",
+            "value": 3840
+          },
+          {
+            "label": "Validation frames",
+            "value": 960
+          },
+          {
+            "label": "Validation videos",
+            "value": 120
+          },
+          {
+            "label": "Inference frames",
+            "value": 16
+          }
+        ],
+        "workflow": [
+          {
+            "label": "Video-level split",
+            "detail": "Train and validation are separated by video_id to avoid frame leakage."
+          },
+          {
+            "label": "Frame sampling",
+            "detail": "Videos are sampled into frame rows instead of storing huge frame exports."
+          },
+          {
+            "label": "Model comparison",
+            "detail": "EfficientNet-B0 and ResNet50 are evaluated on frame and video metrics."
+          },
+          {
+            "label": "Inference aggregation",
+            "detail": "Frame probabilities are averaged into a video-level probability and thresholded."
+          }
+        ]
+      },
+      "artifacts": [
+        {
+          "name": "train_frames.csv",
+          "rows": 3840,
+          "ship": false
+        },
+        {
+          "name": "val_frames.csv",
+          "rows": 960,
+          "ship": false
+        },
+        {
+          "name": "val_video_scores.csv",
+          "rows": 120,
+          "ship": false
+        },
+        {
+          "name": "eval_report.json",
+          "sizeKb": 1,
+          "ship": true
+        },
+        {
+          "name": "roc_video.png",
+          "sizeKb": 37,
+          "ship": true
+        },
+        {
+          "name": "cm_video_thr.png",
+          "sizeKb": 33,
+          "ship": true
+        },
+        {
+          "name": "model_final.pt",
+          "sizeKb": 92146,
+          "ship": false
+        },
+        {
+          "name": "best_resnet50.pt",
+          "sizeKb": 92146,
+          "ship": false
+        }
+      ],
+      "excluded": [
+        "best_*.pt",
+        "artifacts/model_final.pt",
+        "raw videos",
+        "large frame exports"
+      ]
+    }
+  }
+}
