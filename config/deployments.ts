@@ -41,7 +41,10 @@ export const liveDeployments = {
     label: "Open crowd counter",
     provider: "Hugging Face Spaces",
     runtime: "Gradio / PyTorch CPU",
-    url: externalUrl(process.env.NEXT_PUBLIC_CROWD_SPACE_URL),
+    url: externalUrlWithFallback(
+      process.env.NEXT_PUBLIC_CROWD_SPACE_URL,
+      "https://hamooshaq-crowd-detection.hf.space"
+    ),
     coldStartNote: "The Space loads model weights on first prediction. Medium-size images are recommended."
   }
 } satisfies Record<string, LiveDeployment>;
